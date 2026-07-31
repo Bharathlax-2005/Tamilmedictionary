@@ -76,14 +76,14 @@ export default function HomePage() {
           getPage('featured-resource'),
           getPage('specialized-areas'),
         ])
-        if (heroRes.status === 'fulfilled') setHero(heroRes.value.data.content)
-        if (statsRes.status === 'fulfilled') setStats(statsRes.value.data.stats || [])
-        if (servicesRes.status === 'fulfilled') setServices(servicesRes.value.data.services || [])
-        if (blogsRes.status === 'fulfilled') setBlogs(blogsRes.value.data.posts || [])
-        if (aboutRes.status === 'fulfilled') setAbout(aboutRes.value.data.content)
-        if (missionRes.status === 'fulfilled') setMission(missionRes.value.data.content)
-        if (featuredRes.status === 'fulfilled') setFeaturedResource(featuredRes.value.data.content)
-        if (areasRes.status === 'fulfilled') setSpecializedAreas(areasRes.value.data.content)
+        if (heroRes.status === 'fulfilled' && heroRes.value?.data?.content) setHero({ ...DEFAULT_HERO, ...heroRes.value.data.content })
+        if (statsRes.status === 'fulfilled') setStats(statsRes.value?.data?.stats || [])
+        if (servicesRes.status === 'fulfilled') setServices(servicesRes.value?.data?.services || [])
+        if (blogsRes.status === 'fulfilled') setBlogs(blogsRes.value?.data?.posts || [])
+        if (aboutRes.status === 'fulfilled' && aboutRes.value?.data?.content) setAbout(aboutRes.value.data.content)
+        if (missionRes.status === 'fulfilled' && missionRes.value?.data?.content) setMission(missionRes.value.data.content)
+        if (featuredRes.status === 'fulfilled' && featuredRes.value?.data?.content) setFeaturedResource(featuredRes.value.data.content)
+        if (areasRes.status === 'fulfilled' && areasRes.value?.data?.content) setSpecializedAreas(areasRes.value.data.content)
       } catch (e) {
         console.error('Failed to load page data', e)
       } finally {
@@ -119,10 +119,11 @@ export default function HomePage() {
     </div>
   )
 
-  const aboutData = about || { heading: "Medical Dictionary in Tamil", body: "", audiences: AUDIENCES.map(a => a.label) }
-  const missionData = mission || { heading: "Our Mission", body: "" }
-  const featuredData = featuredResource || { heading: "Medical Glossary Collection", author: "Prof. Dr. Semmal Mustafa", ta_title: "மருத்துவக் கலைச்சொல் களஞ்சியம்", description: "", download_url: "#" }
-  const areasData = specializedAreas || { heading: "Our Expertise", areas: [] }
+  const heroData = { ...DEFAULT_HERO, ...(hero || {}) }
+  const aboutData = { heading: "Medical Dictionary in Tamil", body: "", audiences: AUDIENCES.map(a => a.label), ...(about || {}) }
+  const missionData = { heading: "Our Mission", body: "", ...(mission || {}) }
+  const featuredData = { heading: "Medical Glossary Collection", author: "Prof. Dr. Semmal Mustafa", ta_title: "மருத்துவக் கலைச்சொல் களஞ்சியம்", description: "", download_url: "#", ...(featuredResource || {}) }
+  const areasData = { heading: "Our Expertise", areas: [], ...(specializedAreas || {}) }
 
   return (
     <div>
@@ -262,14 +263,14 @@ export default function HomePage() {
                       background: 'linear-gradient(135deg,#6366f1,#818cf8)',
                       color: 'white', fontSize: '10px', fontWeight: 700,
                       padding: '2px 10px', borderRadius: '999px', letterSpacing: '0.06em'
-                    }}>திருக்குறள் {hero.kural_number || '645'}</span>
+                    }}>திருக்குறள் {heroData.kural_number || '645'}</span>
                   </div>
                   <div className="font-tamil" style={{ lineHeight: 1.7 }}>
                     <p style={{ color: '#1e1b4b', fontSize: '0.88rem', fontWeight: 700, margin: '0 0 2px 0', whiteSpace: 'nowrap' }}>
-                      {hero.kural_line1 || 'சொல்லுக சொல்லைப் பிறிதோர்சொல் அச்சொல்லை'}
+                      {heroData.kural_line1 || 'சொல்லுக சொல்லைப் பிறிதோர்சொல் அச்சொல்லை'}
                     </p>
                     <p style={{ color: '#1e1b4b', fontSize: '0.88rem', fontWeight: 700, margin: 0, whiteSpace: 'nowrap' }}>
-                      {hero.kural_line2 || 'வெல்லுஞ்சொல் இன்மை அறிந்து.'}
+                      {heroData.kural_line2 || 'வெல்லுஞ்சொல் இன்மை அறிந்து.'}
                     </p>
                   </div>
                   <p style={{ color: '#6366f1', fontSize: '11px', fontWeight: 600, marginTop: '6px', marginBottom: 0 }}>— திருவள்ளுவர்</p>
@@ -287,7 +288,7 @@ export default function HomePage() {
               <div className="hero-slide-up" style={{ animationDelay: '100ms' }}>
                 {/* Tamil sub-heading */}
                 <p className="font-tamil" style={{ fontSize: '0.95rem', fontWeight: 700, color: '#4f46e5', marginBottom: '10px' }}>
-                  {hero.heading_ta || 'உலகின் முதல் தமிழ் மருத்துவச் சொல்லகராதி'}
+                  {heroData.heading_ta || 'உலகின் முதல் தமிழ் மருத்துவச் சொல்லகராதி'}
                 </p>
                 <h1 style={{
                   fontSize: 'clamp(2.4rem, 4.8vw, 3.6rem)',
@@ -303,11 +304,11 @@ export default function HomePage() {
                 </h1>
                 {/* Subtitle */}
                 <p style={{ fontSize: '1rem', fontWeight: 600, color: '#6366f1', marginBottom: '8px' }}>
-                  {hero.subtitle || 'English → Tamil Medical Glossary'}
+                  {heroData.subtitle || 'English → Tamil Medical Glossary'}
                 </p>
                 {/* Description */}
                 <p style={{ color: '#64748b', fontSize: '0.93rem', lineHeight: 1.75, maxWidth: '500px', marginBottom: 0 }}>
-                  {hero.description || 'The most comprehensive Tamil Medical Dictionary and Thesaurus designed for students, healthcare professionals, researchers, translators, and medical writers.'}
+                  {heroData.description || 'The most comprehensive Tamil Medical Dictionary and Thesaurus designed for students, healthcare professionals, researchers, translators, and medical writers.'}
                 </p>
               </div>
 
@@ -373,11 +374,11 @@ export default function HomePage() {
                 </form>
 
                 {/* 5 ── Popular searches */}
-                {hero.popular_searches?.length > 0 && (
+                {heroData.popular_searches?.length > 0 && (
                   <div style={{ marginTop: '14px' }}>
                     <p style={{ color: '#6b7280', fontSize: '0.77rem', fontWeight: 600, marginBottom: '8px' }}>Popular Searches</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-                      {hero.popular_searches.map((term) => (
+                      {heroData.popular_searches.map((term) => (
                         <button key={term} className="popular-tag"
                           onClick={() => navigate(`/dictionary?q=${encodeURIComponent(term)}`)}
                           style={{
