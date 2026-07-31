@@ -99,7 +99,7 @@ export default function AboutPage() {
   useEffect(() => {
     getTeamMembers()
       .then(res => {
-        if (res.data && res.data.length > 0) {
+        if (Array.isArray(res.data) && res.data.length > 0) {
           setMembers(res.data)
         }
       })

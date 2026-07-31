@@ -28,7 +28,7 @@ export default function CollectionsPage() {
 
   useEffect(() => {
     getCollections()
-      .then((res) => setDocuments(res.data.documents || []))
+      .then((res) => setDocuments(Array.isArray(res.data?.documents) ? res.data.documents : []))
       .catch((err) => {
         console.error(err)
         setError('Failed to load document collections. Please try again later.')

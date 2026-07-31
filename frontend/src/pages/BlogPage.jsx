@@ -16,7 +16,7 @@ export default function BlogPage() {
   useEffect(() => {
     setLoading(true)
     listBlogPosts({ page, limit: 9 })
-      .then(r => { setPosts(r.data.posts || []); setPages(r.data.pages || 1) })
+      .then(r => { setPosts(Array.isArray(r.data?.posts) ? r.data.posts : []); setPages(r.data?.pages || 1) })
       .finally(() => setLoading(false))
   }, [page])
 
