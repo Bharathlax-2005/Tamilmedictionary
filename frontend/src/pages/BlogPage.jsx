@@ -47,7 +47,7 @@ export default function BlogPage() {
                   <button key={i} onClick={() => setPage(i + 1)}
                     style={{
                       width:'38px', height:'38px', borderRadius:'12px', fontSize:'13px', fontWeight:700,
-                      cursor:'pointer', border:'none', transition:'all 0.2s ease',
+                      cursor:'pointer', transition:'all 0.2s ease',
                       background: page===i+1 ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : 'white',
                       color: page===i+1 ? 'white' : '#6b7280',
                       boxShadow: page===i+1 ? '0 4px 12px rgba(99,102,241,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',

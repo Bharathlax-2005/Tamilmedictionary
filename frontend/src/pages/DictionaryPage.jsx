@@ -241,7 +241,7 @@ export default function DictionaryPage() {
             onClick={() => { setCategory(''); setPage(1) }}
             style={{
               padding:'6px 16px', borderRadius:'999px', fontSize:'12.5px', fontWeight:600,
-              cursor:'pointer', border:'none', transition:'all 0.2s ease',
+              cursor:'pointer', transition:'all 0.2s ease',
               background: !category ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : 'white',
               color: !category ? 'white' : '#6b7280',
               boxShadow: !category ? '0 4px 12px rgba(99,102,241,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',

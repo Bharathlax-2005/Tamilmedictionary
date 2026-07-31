@@ -7,7 +7,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '@admin': path.resolve(__dirname, '../admin/src'),
+      'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
+      'react': path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      'axios': path.resolve(__dirname, 'node_modules/axios'),
+      'lucide-react': path.resolve(__dirname, 'node_modules/lucide-react'),
     },
+    dedupe: ['react', 'react-dom', 'react-router-dom', 'axios', 'lucide-react'],
   },
   server: {
     port: 5173,
