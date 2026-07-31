@@ -1,0 +1,11 @@
+from .auth import router as auth
+from .dictionary import router as dictionary
+from .pages import router as pages
+from .blog import router as blog
+from .services import router as services
+from .stats import router as stats
+from .contact import router as contact
+from .shop import router as shop
+from .admin import router as admin
+from .team import router as team
+from .collections import router as collections
