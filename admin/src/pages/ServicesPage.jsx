@@ -9,7 +9,7 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingService, setEditingService] = useState(null)
-  const [formData, setFormData] = useState({ title: '', description: '', icon: '🔬', order: 0 })
+  const [formData, setFormData] = useState({ title: '', description: '', icon: 'Activity', order: 0 })
   const [saving, setSaving] = useState(false)
 
   const fetchServices = async () => {
@@ -28,15 +28,16 @@ export default function ServicesPage() {
 
   const openCreateModal = () => {
     setEditingService(null)
-    setFormData({ title: '', description: '', icon: '🔬', order: services.length + 1 })
+    setFormData({ title: '', description: '', icon: 'Activity', order: services.length + 1 })
     setIsModalOpen(true)
   }
 
   const openEditModal = (s) => {
     setEditingService(s)
-    setFormData({ title: s.title || '', description: s.description || '', icon: s.icon || '🔬', order: s.order || 0 })
+    setFormData({ title: s.title || '', description: s.description || '', icon: s.icon || 'Activity', order: s.order || 0 })
     setIsModalOpen(true)
   }
+
 
   const handleSave = async (e) => {
     e.preventDefault()

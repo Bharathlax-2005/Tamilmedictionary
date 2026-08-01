@@ -42,10 +42,15 @@ export const adminStats = () => api.get('/api/admin/dashboard/stats')
 
 // Terms
 export const getTerms = (p) => api.get('/api/dictionary/terms', { params: p })
-export const searchTermsAdmin = (q, p) => api.get('/api/dictionary/search', { params: { q, page: p, limit: 20 } })
+export const searchTermsAdmin = (q, p, category = '') => api.get('/api/dictionary/search', { params: { q, page: p, limit: 20, category: category || undefined } })
+export const getCategoriesAdmin = () => api.get('/api/dictionary/categories')
 export const createTerm = (d) => api.post('/api/dictionary/terms', d)
 export const updateTerm = (id, d) => api.put(`/api/dictionary/terms/${id}`, d)
 export const deleteTerm = (id) => api.delete(`/api/dictionary/terms/${id}`)
+export const importTermsAdmin = (formData) => api.post('/api/dictionary/import', formData)
+
+export const exportTermsAdmin = (format = 'json') => api.get('/api/dictionary/export', { params: { format }, responseType: 'blob' })
+
 
 // Blog
 export const getBlogs = (p) => api.get('/api/blog/posts', { params: { ...p, published_only: false } })
@@ -87,6 +92,8 @@ export const createTeamMember = (d) => api.post('/api/team', d)
 export const updateTeamMember = (id, d) => api.put(`/api/team/${id}`, d)
 export const deleteTeamMember = (id) => api.delete(`/api/team/${id}`)
 export const reorderTeamMembers = (list) => api.post('/api/team/reorder', list)
+export const uploadTeamPhoto = (formData) => api.post('/api/team/upload-photo', formData)
+
 
 // Collections
 export const getCollections = () => api.get('/api/collections/')

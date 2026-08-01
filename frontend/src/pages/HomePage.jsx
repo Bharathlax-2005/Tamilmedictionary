@@ -1,12 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, ArrowRight, Download, CheckCircle2, ChevronRight, Mail, MapPin, Send } from 'lucide-react'
-import { getPage, listStats, listServices, listBlogPosts, submitContact } from '../services/api'
+import {
+  Search, ArrowRight, Download, CheckCircle2, ChevronRight, Mail, MapPin, Send, Sparkles,
+  BookOpen, Target, Building2, Award, GraduationCap, Microscope, Stethoscope, Languages,
+  PenTool, FileSpreadsheet, RefreshCw, ShieldCheck, Headphones, Pill, Activity, UserCheck, BookMarked, Trophy, Globe
+} from 'lucide-react'
+
+
+import { getPage, listStats, listServices, listBlogPosts, submitContact, searchTerms } from '../services/api'
 import StatCard from '../components/StatCard'
 import ServiceCard from '../components/ServiceCard'
 import BlogCard from '../components/BlogCard'
 import LoadingSpinner from '../components/LoadingSpinner'
 import useScrollReveal from '../hooks/useScrollReveal'
+import useDebounce from '../hooks/useDebounce'
 
 const DEFAULT_HERO = {
   kural_line1: "சொல்லுக சொல்லைப் பிறிதோர்சொல் அச்சொல்லை",
@@ -25,22 +32,32 @@ const DEFAULT_HERO = {
   popular_searches: ["Anatomy", "Cardiology", "Neurology", "Pharmacology", "Surgery"],
 }
 
+function getStatIcon(ic) {
+  if (ic === '📚') return <BookMarked size={32} className="text-primary-600 mb-2 mx-auto" />
+  if (ic === '🎯') return <Target size={32} className="text-primary-600 mb-2 mx-auto" />
+  if (ic === '🏥') return <Building2 size={32} className="text-primary-600 mb-2 mx-auto" />
+  if (ic === '⭐') return <Award size={32} className="text-primary-600 mb-2 mx-auto" />
+  if (typeof ic === 'string' && ic.length <= 2) return <Activity size={32} className="text-primary-600 mb-2 mx-auto" />
+  return <div className="text-3xl mb-2">{ic}</div>
+}
+
 const AUDIENCES = [
-  { icon: "✍️", label: "Medical Writers" },
-  { icon: "🌐", label: "Medical Translators" },
-  { icon: "👨‍⚕️", label: "Doctors" },
-  { icon: "🎓", label: "Medical Students" },
-  { icon: "🔬", label: "Researchers" },
-  { icon: "🏥", label: "Healthcare Professionals" },
-  { icon: "📚", label: "Academicians" },
+  { icon: <PenTool size={22} className="text-rose-500" />, label: "Medical Writers" },
+  { icon: <Languages size={22} className="text-teal-600" />, label: "Medical Translators" },
+  { icon: <Stethoscope size={22} className="text-cyan-600" />, label: "Doctors" },
+  { icon: <GraduationCap size={22} className="text-purple-600" />, label: "Medical Students" },
+  { icon: <Microscope size={22} className="text-indigo-600" />, label: "Researchers" },
+  { icon: <Building2 size={22} className="text-blue-600" />, label: "Healthcare Professionals" },
+  { icon: <BookOpen size={22} className="text-primary-600" />, label: "Academicians" },
 ]
 
 const PROCESS_STEPS = [
-  { step: "01", title: "Glossary Compilation", description: "Building an extensive collection of validated medical terminology from authoritative sources.", icon: "📋" },
-  { step: "02", title: "Translation", description: "Professional translation by experienced linguistic and medical experts.", icon: "🔄" },
-  { step: "03", title: "Quality Assurance", description: "Rigorous proofreading and medical validation by certified professionals.", icon: "✅" },
-  { step: "04", title: "Client Support", description: "Continuous assistance and revision support whenever needed.", icon: "🤝" },
+  { step: "01", title: "Glossary Compilation", description: "Building an extensive collection of validated medical terminology from authoritative sources.", icon: <FileSpreadsheet size={24} className="text-primary-600" /> },
+  { step: "02", title: "Translation", description: "Professional translation by experienced linguistic and medical experts.", icon: <Languages size={24} className="text-emerald-600" /> },
+  { step: "03", title: "Quality Assurance", description: "Rigorous proofreading and medical validation by certified professionals.", icon: <ShieldCheck size={24} className="text-indigo-600" /> },
+  { step: "04", title: "Client Support", description: "Continuous assistance and revision support whenever needed.", icon: <Headphones size={24} className="text-blue-600" /> },
 ]
+
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -54,6 +71,10 @@ export default function HomePage() {
   const [featuredResource, setFeaturedResource] = useState(null)
   const [specializedAreas, setSpecializedAreas] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [suggestions, setSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [searchFocused, setSearchFocused] = useState(false)
+  const debouncedQuery = useDebounce(query, 250)
 
   // Contact form
   const [form, setForm] = useState({ first_name: '', last_name: '', email: '', company: '', message: '' })
@@ -93,9 +114,28 @@ export default function HomePage() {
     load()
   }, [])
 
+  useEffect(() => {
+    if (debouncedQuery.trim() && searchFocused) {
+      searchTerms(debouncedQuery.trim(), 1, 5, '').then(res => {
+        setSuggestions(res.data.results || [])
+        setShowSuggestions(true)
+      }).catch(err => console.error(err))
+    } else {
+      setSuggestions([])
+      setShowSuggestions(false)
+    }
+  }, [debouncedQuery, searchFocused])
+
   const handleSearch = (e) => {
-    e.preventDefault()
+    e?.preventDefault()
+    setShowSuggestions(false)
     if (query.trim()) navigate(`/dictionary?q=${encodeURIComponent(query.trim())}`)
+  }
+
+  const handleSuggestionClick = (term) => {
+    setQuery(term.en_term)
+    setShowSuggestions(false)
+    navigate(`/dictionary?q=${encodeURIComponent(term.en_term)}`)
   }
 
   const handleContactSubmit = async (e) => {
@@ -275,13 +315,7 @@ export default function HomePage() {
                   </div>
                   <p style={{ color: '#6366f1', fontSize: '11px', fontWeight: 600, marginTop: '6px', marginBottom: 0 }}>— திருவள்ளுவர்</p>
                 </div>
-                {/* Thiruvalluvar icon right side */}
-                <div style={{
-                  width: '46px', height: '46px', flexShrink: 0, borderRadius: '12px',
-                  background: 'linear-gradient(135deg,#ede9fe,#dbeafe)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '22px'
-                }}>🏛️</div>
+
               </div>
 
               {/* 2 ── Main heading */}
@@ -338,6 +372,7 @@ export default function HomePage() {
               {/* 4 ── Search bar */}
               <div className="hero-slide-up" style={{ animationDelay: '200ms' }}>
                 <form onSubmit={handleSearch} style={{
+                  position: 'relative',
                   display: 'flex', alignItems: 'center',
                   background: 'white',
                   border: '1.5px solid #e0e7ff',
@@ -351,6 +386,8 @@ export default function HomePage() {
                     type="text" id="hero-search"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => setSearchFocused(true)}
+                    onBlur={() => setSearchFocused(false)}
                     placeholder="Search medical terms in English..."
                     className="hero-search-input"
                     style={{
@@ -358,7 +395,8 @@ export default function HomePage() {
                       color: '#1e1b4b', fontSize: '0.92rem', fontWeight: 500, padding: '6px 0'
                     }}
                   />
-                  <span style={{ color: '#9ca3af', fontSize: '0.78rem', fontWeight: 500, whiteSpace: 'nowrap', paddingRight: '8px', borderRight: '1px solid #e5e7eb' }}>
+                  
+                  <span className="hidden sm:inline-block" style={{ color: '#9ca3af', fontSize: '0.78rem', fontWeight: 500, whiteSpace: 'nowrap', paddingRight: '8px', borderRight: '1px solid #e5e7eb' }}>
                     English → Tamil
                   </span>
                   <button type="submit" className="hero-search-btn" style={{
@@ -372,6 +410,38 @@ export default function HomePage() {
                     Search Dictionary <Search size={14} />
                   </button>
                 </form>
+
+                {/* Suggestions Box */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div style={{
+                    display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '12px',
+                    animation: 'popIn 0.2s ease both', justifyContent: 'flex-start', alignItems: 'center',
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    border: '1.5px solid rgba(99,102,241,0.15)',
+                    borderRadius: '12px',
+                    padding: '10px 16px',
+                    boxShadow: '0 4px 12px rgba(99,102,241,0.08)',
+                    backdropFilter: 'blur(8px)',
+                    width: '100%', boxSizing: 'border-box'
+                  }}>
+                    <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: 600, marginRight: '6px' }}>Suggestions:</span>
+                    {suggestions.map((sug, i) => (
+                      <span
+                        key={sug.id || i}
+                        onMouseDown={() => handleSuggestionClick(sug)}
+                        style={{
+                          cursor: 'pointer', transition: 'all 0.15s ease',
+                          fontWeight: 600, color: '#4f46e5', fontSize: '14px',
+                          padding: '4px 8px', borderRadius: '6px'
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                      >
+                        {sug.en_term}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {/* 5 ── Popular searches */}
                 {heroData.popular_searches?.length > 0 && (
@@ -417,12 +487,6 @@ export default function HomePage() {
                     alt="Tamil Medical Dictionary research"
                     style={{ width: '100%', height: '400px', objectFit: 'cover', display: 'block' }}
                   />
-                  {/* Dark gradient bottom overlay */}
-                  <div style={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0, height: '50%',
-                    background: 'linear-gradient(0deg, rgba(10,8,40,0.55) 0%, transparent 100%)',
-                    pointerEvents: 'none'
-                  }} />
                 </div>
 
                 {/* Floating specialty bubbles */}
@@ -458,13 +522,13 @@ export default function HomePage() {
                 boxShadow: '0 4px 20px rgba(99,102,241,0.08)'
               }}>
                 {[
-                  { v: '10K+', l: 'Medical Terms', icon: '📖' },
-                  { v: '98%', l: 'Accuracy Rate', icon: '✅' },
-                  { v: '8+', l: 'Years of Trust', icon: '🏆' },
-                  { v: 'Free', l: 'For Everyone', icon: '🎁' },
+                  { v: '10K+', l: 'Medical Terms', icon: <BookMarked size={20} className="text-primary-600 mx-auto" /> },
+                  { v: '98%', l: 'Accuracy Rate', icon: <CheckCircle2 size={20} className="text-emerald-600 mx-auto" /> },
+                  { v: '8+', l: 'Years of Trust', icon: <Trophy size={20} className="text-amber-500 mx-auto" /> },
+                  { v: 'Free', l: 'For Everyone', icon: <Sparkles size={20} className="text-indigo-500 mx-auto" /> },
                 ].map((s, i) => (
                   <div key={i} className="stat-pill" style={{ textAlign: 'center', padding: '4px 6px' }}>
-                    <p style={{ fontSize: '1.3rem', margin: '0 0 4px 0' }}>{s.icon}</p>
+                    <div className="mb-1 flex justify-center">{s.icon}</div>
                     <p style={{ color: '#4f46e5', fontWeight: 900, fontSize: '1.25rem', margin: '0 0 2px 0', lineHeight: 1 }}>{s.v}</p>
                     <p style={{ color: '#6b7280', fontSize: '0.66rem', fontWeight: 600, margin: 0 }}>{s.l}</p>
                   </div>
@@ -490,56 +554,166 @@ export default function HomePage() {
                 Learn More <ArrowRight size={16} />
               </a>
             </div>
-            <div className="grid grid-cols-2 gap-4 stagger">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger">
               {(aboutData.audiences || AUDIENCES.map(a => a.label)).map((audience, i) => {
-                const aud = typeof audience === 'string' ? { icon: AUDIENCES[i]?.icon || '👤', label: audience } : audience
+                const matchedAud = AUDIENCES.find(a => a.label === (typeof audience === 'string' ? audience : audience.label))
+                const iconComponent = typeof audience === 'object' && audience.icon ? audience.icon : matchedAud?.icon || <UserCheck size={22} className="text-primary-600" />
                 return (
                   <div key={i} className="reveal glass-card-light" style={{ padding:'20px', display:'flex', alignItems:'center', gap:'12px', animationDelay:`${i*60}ms` }}>
-                    <span style={{ fontSize:'24px' }}>{aud.icon || AUDIENCES[i]?.icon || '👤'}</span>
+                    <div className="w-10 h-10 rounded-xl bg-slate-100/90 flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-200/60">
+                      {iconComponent}
+                    </div>
                     <span style={{ fontSize:'13.5px', fontWeight:600, color:'#1e1b4b' }}>{typeof audience === 'string' ? audience : audience.label}</span>
                   </div>
                 )
               })}
+
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 3. FEATURED RESOURCE ────────────────────────────────────────────── */}
-      <section className="section-pad bg-gradient-hero">
+
+      {/* ── 3. FEATURED RESOURCE / MEDICAL GLOSSARY COLLECTION ────────────────────────────── */}
+      <section className="section-pad bg-gradient-hero border-y border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="glass-card p-10 md:p-14 flex flex-col md:flex-row items-center gap-10">
-            <div className="w-24 h-24 rounded-2xl bg-gradient-blue flex items-center justify-center text-4xl flex-shrink-0 animate-float shadow-soft-lg">
-              📖
-            </div>
-            <div className="flex-1 text-center md:text-left">
-              <span className="badge mb-3">Featured Resource</span>
-              <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">{featuredData.heading}</h2>
-              <p className="text-primary-600 font-semibold mb-1">{featuredData.author}</p>
-              <p className="font-tamil text-xl text-slate-600 mb-4">{featuredData.ta_title}</p>
-              <p className="text-slate-500 mb-6">{featuredData.description}</p>
-              <button
-                type="button"
-                onClick={() => navigate('/collections')}
-                className="btn-primary inline-flex"
-              >
-                <Download size={16} /> Download Document
-              </button>
+          <div className="glass-card p-6 sm:p-10 border border-slate-200/90 rounded-3xl shadow-xl bg-white/90 backdrop-blur-xl">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Left Side Collection Image with Modern Curvy Styling */}
+              <div className="lg:col-span-5 relative group">
+                {/* Background Glow */}
+                <div className="absolute -inset-3 bg-gradient-to-br from-indigo-500 via-primary-500 to-blue-600 rounded-tl-[4.5rem] rounded-br-[4.5rem] rounded-tr-3xl rounded-bl-3xl opacity-25 blur-xl group-hover:opacity-40 transition-all duration-500" />
+                
+                {/* Modern Asymmetrical Curved Container (Top-Left & Bottom-Right Curves) */}
+                <div className="relative rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-2xl rounded-bl-2xl overflow-hidden border-4 border-white shadow-2xl ring-1 ring-slate-200/80 bg-slate-900 aspect-[4/3] sm:h-80 w-full">
+                  <img
+                    src="/images/collection.png"
+                    alt="Medical Glossary Collection"
+                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                    onError={(e) => {
+                      e.target.onerror = null
+                      e.target.src = "/images/AdobeStock_293330068.jpeg"
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
+              </div>
+
+              {/* Right Side Content */}
+              <div className="lg:col-span-7 space-y-5 text-left">
+                <div>
+                  <span className="badge mb-2 inline-flex items-center gap-1.5 px-3 py-1 bg-primary-100 text-primary-700 font-semibold rounded-full text-xs uppercase tracking-wider">
+                    <Sparkles size={14} className="text-primary-600" /> Featured Collection
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
+                    {featuredData.heading}
+                  </h2>
+                  <p className="text-xs font-semibold text-primary-600 mt-1">{featuredData.author}</p>
+                </div>
+
+                <p className="font-tamil text-xl font-bold text-slate-800">
+                  {featuredData.ta_title}
+                </p>
+
+                <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                  {featuredData.description}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/collections')}
+                    className="btn-primary inline-flex items-center gap-2 py-3 px-6 rounded-xl shadow-lg"
+                  >
+                    <Download size={18} /> Download Document Collection
+                  </button>
+                  <a href="/about" className="btn-outline inline-flex items-center gap-2 py-3 px-5 rounded-xl">
+                    Learn More <ArrowRight size={16} />
+                  </a>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
       </section>
+
 
       {/* ── 4. MISSION ──────────────────────────────────────────────────────── */}
-      <section className="section-pad bg-white relative overflow-hidden">
+      <section className="section-pad bg-white relative overflow-hidden border-y border-slate-100">
         <div className="blob w-80 h-80 bg-primary-300 -bottom-20 -right-20" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <span className="badge mb-4">Our Mission</span>
-          <h2 className="section-heading mb-6">{missionData.heading}</h2>
-          <p className="section-subheading mb-8 max-w-2xl mx-auto">{missionData.body}</p>
-          <a href="/about" className="btn-outline">About Us <ArrowRight size={16} /></a>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left Content */}
+            <div className="lg:col-span-7 space-y-6 text-left">
+              <div>
+                <span className="badge mb-3 inline-flex items-center gap-1.5 px-3 py-1 bg-primary-100 text-primary-700 font-semibold rounded-full text-xs uppercase tracking-wider">
+                  <Sparkles size={14} className="text-primary-600" /> Our Mission
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+                  {missionData.heading}
+                </h2>
+              </div>
+
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+                {missionData.body}
+              </p>
+
+              {/* Mission Bullet Points */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl">
+                  <div className="w-8 h-8 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                    ✓
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-xs">Standardized Terminology</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Vetted by healthcare practitioners & language experts.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                    ✓
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-xs">Accessible Healthcare</h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Empowering patients & medical professionals alike.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <a href="/about" className="btn-primary inline-flex items-center gap-2">
+                  About Us <ArrowRight size={16} />
+                </a>
+              </div>
+            </div>
+
+            {/* Right Side Image with Modern Opposite End Curved Styling */}
+            <div className="lg:col-span-5 relative group">
+              {/* Glowing Background Glow */}
+              <div className="absolute -inset-3 bg-gradient-to-tr from-primary-500 via-emerald-400 to-blue-500 rounded-tr-[4.5rem] rounded-bl-[4.5rem] rounded-tl-3xl rounded-br-3xl opacity-25 blur-xl group-hover:opacity-40 transition-all duration-500" />
+              
+              {/* Modern Asymmetrical Curved Container (Opposite Ends Curved) */}
+              <div className="relative rounded-tr-[4rem] rounded-bl-[4rem] rounded-tl-2xl rounded-br-2xl overflow-hidden border-4 border-white shadow-2xl ring-1 ring-slate-200/80 bg-slate-900">
+                <img
+                  src="/images/480_F_328026660_eGnryhW4ldjfXwMqEt9BMl3Z3jFdp1iK.jpg"
+                  alt="Our Mission"
+                  className="w-full h-80 sm:h-96 object-cover transform group-hover:scale-105 transition-transform duration-700"
+                  onError={(e) => {
+                    e.target.onerror = null
+                    e.target.src = "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80"
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
+
 
       {/* ── 5. SERVICES ─────────────────────────────────────────────────────── */}
       <section className="section-pad bg-gradient-hero">
@@ -577,7 +751,7 @@ export default function HomePage() {
               {stats.map((stat, i) => (
                 <div key={stat.id || i} className="glass-card p-6 text-center animate-fade-in-up"
                   style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'both' }}>
-                  <div className="text-3xl mb-2">{stat.icon}</div>
+                  {getStatIcon(stat.icon)}
                   <div className="text-3xl font-extrabold text-primary-600 mb-1">{stat.value}</div>
                   <p className="text-xs text-slate-500 leading-snug">{stat.label}</p>
                 </div>
@@ -585,14 +759,18 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-              {[{ value: '10K+', label: 'Medical Terms Translated', icon: '📚' },
-                { value: '98%', label: 'Translation Accuracy', icon: '🎯' },
-                { value: '25+', label: 'Institutions Served', icon: '🏥' },
-                { value: '8+', label: 'Years of Excellence', icon: '⭐' }].map((s, i) => (
+              {[
+                { value: '10K+', label: 'Medical Terms Translated', icon: <BookOpen size={24} className="text-white mx-auto" /> },
+                { value: '98%', label: 'Translation Accuracy', icon: <Target size={24} className="text-emerald-300 mx-auto" /> },
+                { value: '25+', label: 'Institutions Served', icon: <Building2 size={24} className="text-sky-300 mx-auto" /> },
+                { value: '8+', label: 'Years of Excellence', icon: <Award size={24} className="text-amber-300 mx-auto" /> }
+              ].map((s, i) => (
                 <div key={i} className="glass-card p-6 text-center">
-                  <div className="text-3xl mb-2">{s.icon}</div>
-                  <div className="text-3xl font-extrabold text-primary-600 mb-1">{s.value}</div>
-                  <p className="text-xs text-slate-500">{s.label}</p>
+                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    {s.icon}
+                  </div>
+                  <div className="text-3xl font-extrabold text-white mb-1">{s.value}</div>
+                  <p className="text-xs text-primary-100 font-medium">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -611,15 +789,18 @@ export default function HomePage() {
             {(areasData.areas?.length > 0
               ? areasData.areas
               : [
-                  { title: "Pharmaceuticals", description: "Translation of pharmaceutical and drug-related terminology.", icon: "💊" },
-                  { title: "Research & Academia", description: "Supporting universities, research organizations, and publications.", icon: "🎓" },
-                  { title: "Healthcare Services", description: "Medical communication support for hospitals, clinics, and healthcare providers.", icon: "🏥" },
+                  { title: "Pharmaceuticals", description: "Translation of pharmaceutical and drug-related terminology.", icon: <Pill size={28} className="text-pink-500" /> },
+                  { title: "Research & Academia", description: "Supporting universities, research organizations, and publications.", icon: <GraduationCap size={28} className="text-purple-600" /> },
+                  { title: "Healthcare Services", description: "Medical communication support for hospitals, clinics, and healthcare providers.", icon: <Building2 size={28} className="text-blue-600" /> },
                 ]
             ).map((area, i) => (
               <div key={i} className="soft-card p-8 text-center animate-fade-in-up"
                 style={{ animationDelay: `${i * 120}ms`, animationFillMode: 'both' }}>
-                <div className="text-5xl mb-5">{area.icon}</div>
+                <div className="w-16 h-16 rounded-2xl bg-slate-100/90 flex items-center justify-center mx-auto mb-5 border border-slate-200/80 shadow-sm">
+                  {typeof area.icon === 'string' ? <Activity size={28} className="text-primary-600" /> : area.icon}
+                </div>
                 <h3 className="text-xl font-bold text-slate-800 mb-3">{area.title}</h3>
+
                 <p className="text-slate-500 text-sm leading-relaxed">{area.description}</p>
               </div>
             ))}
@@ -643,7 +824,6 @@ export default function HomePage() {
                 style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'both' }}>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-4xl font-black text-primary-100 leading-none">{step.step}</span>
-                  <span className="text-3xl">{step.icon}</span>
                 </div>
                 <h3 className="font-semibold text-slate-800 mb-2">{step.title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">{step.description}</p>

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+import uuid
+from pathlib import Path
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from typing import List
 from bson import ObjectId
 from datetime import datetime, timezone
@@ -7,6 +9,10 @@ from ..models import TeamMember, TeamMemberCreate, TeamMemberUpdate
 from ..security import get_current_admin
 
 router = APIRouter(prefix="/api/team", tags=["Team Members"])
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+TEAM_UPLOADS_DIR = BASE_DIR / "uploads" / "team"
+TEAM_UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def serialize_member(doc: dict) -> dict:
@@ -24,12 +30,85 @@ def serialize_member(doc: dict) -> dict:
     }
 
 
+import io
+from PIL import Image, ImageOps
+
+
+def process_and_crop_team_photo(image_bytes: bytes, target_width=500, target_height=600) -> bytes:
+    try:
+        img = Image.open(io.BytesIO(image_bytes))
+        try:
+            img = ImageOps.exif_transpose(img)
+        except Exception:
+            pass
+
+        has_alpha = img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info)
+        if has_alpha:
+            img = img.convert("RGBA")
+        else:
+            img = img.convert("RGB")
+
+        resampling = getattr(Image, 'Resampling', Image).LANCZOS
+        img_fit = ImageOps.fit(
+            img,
+            (target_width, target_height),
+            method=resampling,
+            centering=(0.5, 0.3)
+        )
+
+        output = io.BytesIO()
+        if has_alpha:
+            img_fit.save(output, format="PNG", optimize=True)
+        else:
+            img_fit.save(output, format="JPEG", quality=90, optimize=True)
+        return output.getvalue()
+    except Exception:
+        return image_bytes
+
+
+@router.post("/upload-photo")
+async def upload_team_photo(
+    file: UploadFile = File(...),
+    current_user=Depends(get_current_admin)
+):
+    ext = Path(file.filename).suffix.lower()
+    allowed_exts = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]
+    if ext not in allowed_exts:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported image format '{ext}'. Allowed: {', '.join(allowed_exts)}"
+        )
+
+    raw_contents = await file.read()
+    
+    # Process & smart crop photo if PNG/JPG/WEBP
+    if ext in [".png", ".jpg", ".jpeg", ".webp"]:
+        processed_contents = process_and_crop_team_photo(raw_contents)
+        saved_ext = ".png" if ext == ".png" else ".jpg"
+    else:
+        processed_contents = raw_contents
+        saved_ext = ext
+
+    unique_filename = f"team_{uuid.uuid4().hex[:12]}{saved_ext}"
+    dest_path = TEAM_UPLOADS_DIR / unique_filename
+    dest_path.write_bytes(processed_contents)
+
+    file_url = f"/uploads/team/{unique_filename}"
+    return {
+        "url": file_url,
+        "filename": unique_filename,
+        "size": len(processed_contents)
+    }
+
+
+
 @router.get("", response_model=List[dict])
 async def get_team_members():
     db = get_db()
     cursor = db.team.find().sort("order", 1)
     members = await cursor.to_list(length=200)
     return [serialize_member(m) for m in members]
+
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)

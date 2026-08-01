@@ -10,7 +10,6 @@ import AboutPage from './pages/AboutPage'
 import ServicesPage from './pages/ServicesPage'
 import BlogPage from './pages/BlogPage'
 import BlogPostPage from './pages/BlogPostPage'
-import ContributePage from './pages/ContributePage'
 import ShopPage from './pages/ShopPage'
 import ContactPage from './pages/ContactPage'
 import FaqPage from './pages/FaqPage'
@@ -64,7 +63,6 @@ function App() {
             <Route path="/services"         element={<ServicesPage />} />
             <Route path="/blog"             element={<BlogPage />} />
             <Route path="/blog/:slug"       element={<BlogPostPage />} />
-            <Route path="/contribute"       element={<ContributePage />} />
             <Route path="/shop"             element={<ShopPage />} />
             <Route path="/contact"          element={<ContactPage />} />
             <Route path="/login"            element={<LoginPage />} />

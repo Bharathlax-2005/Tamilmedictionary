@@ -189,7 +189,7 @@ export default function ContactPage() {
             <p style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '28px' }}>Our team will respond within 24–48 hours.</p>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <FloatingInput id="contact-first-name" label="First Name" value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} required />
                 <FloatingInput id="contact-last-name" label="Last Name" value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} required />
               </div>

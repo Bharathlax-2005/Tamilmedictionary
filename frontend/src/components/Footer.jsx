@@ -7,9 +7,9 @@ const quickLinks = [
   { to: '/about',      label: 'About' },
   { to: '/services',   label: 'Services' },
   { to: '/blog',       label: 'Blog' },
-  { to: '/contact',    label: 'Contact' },
-  { to: '/contribute', label: 'Contribute' },
+  { to: '/collections',label: 'Collections' },
   { to: '/shop',       label: 'Shop' },
+  { to: '/contact',    label: 'Contact' },
 ]
 
 const legalLinks = [

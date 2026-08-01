@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Download, FileText, Sparkles, ArrowRight } from 'lucide-react'
+import { Download, FileText, Sparkles, ArrowRight, FolderOpen } from 'lucide-react'
 import { getCollections } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PageHero from '../components/PageHero'
 import useScrollReveal from '../hooks/useScrollReveal'
+
 
 function formatSize(bytes) {
   if (!bytes) return '0 B'
@@ -54,12 +55,15 @@ export default function CollectionsPage() {
           <div className="soft-card p-8 text-center text-slate-600 reveal-scale">{error}</div>
         ) : documents.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0' }} className="reveal-scale">
-            <div style={{ fontSize: '64px', marginBottom: '16px' }}>📚</div>
+            <div className="w-20 h-20 rounded-3xl bg-indigo-50 flex items-center justify-center border border-indigo-100 text-indigo-600 shadow-sm mx-auto mb-4">
+              <FolderOpen size={40} />
+            </div>
             <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#1e1b4b', marginBottom: '8px' }}>No documents available yet</h3>
             <p style={{ color: '#9ca3af' }}>Check back soon for uploaded medical glossaries and publications.</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(320px,1fr))', gap: '24px' }} className="stagger">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
             {documents.map((doc, i) => (
               <div key={doc.id} className="reveal glass-card-light" style={{ padding: '24px', display: 'flex', flexDirection: 'column', animationDelay: `${i * 60}ms` }}>
                 <div style={{ display: 'flex', itemsAlign: 'flex-start', gap: '16px', marginBottom: '16px' }}>

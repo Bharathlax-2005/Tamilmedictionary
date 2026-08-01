@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { HelpCircle, ChevronDown, Mail } from 'lucide-react'
+import { HelpCircle, ChevronDown, Mail, MessageSquare } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import PageHero from '../components/PageHero'
 import useScrollReveal from '../hooks/useScrollReveal'
+
 
 const FAQS = [
   {
@@ -15,7 +16,7 @@ const FAQS = [
   },
   {
     q: "Can I contribute new medical terms to the dictionary?",
-    a: "Yes! We welcome contributions from healthcare workers and language experts. You can submit suggestions via our Contribute page."
+    a: "Yes! We welcome contributions from healthcare workers and language experts. You can submit suggestions via our Contact Us page."
   },
   {
     q: "Do you offer digital PDF glossaries or print editions?",
@@ -95,8 +96,11 @@ export default function FaqPage() {
 
         {/* CTA */}
         <div style={{ textAlign:'center', marginTop:'48px', padding:'36px', background:'linear-gradient(135deg,rgba(99,102,241,0.06),rgba(59,130,246,0.04))', borderRadius:'20px', border:'1.5px solid rgba(99,102,241,0.10)' }} className="reveal">
-          <div style={{ fontSize:'40px', marginBottom:'12px' }}>💬</div>
+          <div className="w-14 h-14 rounded-2xl bg-indigo-100/70 flex items-center justify-center border border-indigo-200/60 text-primary-600 shadow-sm mx-auto mb-3">
+            <MessageSquare size={28} />
+          </div>
           <p style={{ fontSize:'16px', fontWeight:700, color:'#1e1b4b', marginBottom:'6px' }}>Still have questions?</p>
+
           <p style={{ fontSize:'14px', color:'#9ca3af', marginBottom:'20px' }}>Our team is here to help you.</p>
           <Link to="/contact" style={{
             display:'inline-flex', alignItems:'center', gap:'8px',

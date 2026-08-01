@@ -3,28 +3,28 @@ import { listProducts } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
 import PageHero from '../components/PageHero'
 import useScrollReveal from '../hooks/useScrollReveal'
-import { ShoppingBag, Star } from 'lucide-react'
+import { ShoppingBag, Star, BookOpen, PackageOpen } from 'lucide-react'
 
 function ProductCard({ product, index }) {
   const isFree = product.price === 0
   const hasDiscount = product.original_price && product.original_price > product.price
-  const discountPct = hasDiscount ? Math.round((1 - product.price / product.original_price) * 100) : null
+  const discountPct = hasDiscount ? Math.round(((product.original_price - product.price) / product.original_price) * 100) : 0
 
   return (
-    <div className="reveal glass-card-light" style={{ overflow: 'hidden', animationDelay: `${index * 60}ms` }}>
+    <div className="reveal glass-card-light" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', animationDelay: `${index * 80}ms` }}>
       {/* Image */}
-      <div style={{
-        height: '180px', overflow: 'hidden',
-        background: 'linear-gradient(135deg,rgba(99,102,241,0.08),rgba(59,130,246,0.06))',
-        position: 'relative',
-      }}>
+      <div style={{ position: 'relative', height: '180px', background: 'linear-gradient(135deg,#f8faff,#eef2ff)', overflow: 'hidden' }}>
         {product.image_url ? (
           <img src={product.image_url} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.45s ease' }}
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.06)'}
             onMouseLeave={e => e.currentTarget.style.transform = ''}
           />
         ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '56px' }}>📚</div>
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="w-16 h-16 rounded-2xl bg-indigo-100/70 flex items-center justify-center border border-indigo-200/60 text-indigo-600 shadow-sm">
+              <BookOpen size={32} />
+            </div>
+          </div>
         )}
         {hasDiscount && (
           <div style={{
@@ -96,15 +96,18 @@ export default function ShopPage() {
         {loading ? (
           <LoadingSpinner size="lg" text="Loading products..." />
         ) : products.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '24px' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stagger">
             {products.map((product, i) => <ProductCard key={product.id || i} product={product} index={i} />)}
           </div>
         ) : (
           <div style={{ textAlign: 'center', padding: '80px 0' }} className="reveal-scale">
-            <div style={{ fontSize: '64px', marginBottom: '16px' }}>📚</div>
+            <div className="w-20 h-20 rounded-3xl bg-indigo-50 flex items-center justify-center border border-indigo-100 text-indigo-600 shadow-sm mx-auto mb-4">
+              <PackageOpen size={40} />
+            </div>
             <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#1e1b4b' }}>Products coming soon</h3>
           </div>
         )}
+
       </div>
     </div>
   )

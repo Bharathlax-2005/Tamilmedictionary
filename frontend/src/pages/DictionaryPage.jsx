@@ -4,6 +4,7 @@ import { Search, ChevronLeft, ChevronRight, BookOpen, Filter, Sparkles, ArrowRig
 import { searchTerms, listTerms, getCategories } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
 import useScrollReveal from '../hooks/useScrollReveal'
+import useDebounce from '../hooks/useDebounce'
 
 /* Animated counter for stats in header */
 function StatBadge({ value, label }) {
@@ -91,7 +92,9 @@ export default function DictionaryPage() {
   const [category, setCategory]   = useState('')
   const [categories, setCategories] = useState([])
   const [focused, setFocused]     = useState(false)
-
+  const [suggestions, setSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const debouncedInput = useDebounce(inputValue, 250)
   useEffect(() => {
     getCategories().then(r => setCategories(r.data.categories || []))
   }, [])
@@ -103,13 +106,27 @@ export default function DictionaryPage() {
     setPage(1)
   }, [searchParams])
 
+  // Fetch suggestions
+  useEffect(() => {
+    if (debouncedInput.trim() && focused) {
+      searchTerms(debouncedInput.trim(), 1, 5, category).then(res => {
+        setSuggestions(res.data.results || [])
+        setShowSuggestions(true)
+      }).catch(err => console.error(err))
+    } else {
+      setSuggestions([])
+      setShowSuggestions(false)
+    }
+  }, [debouncedInput, focused, category])
+
   const fetchTerms = useCallback(async () => {
     setLoading(true)
     try {
       let res
       if (query.trim()) {
-        res = await searchTerms(query.trim(), page, 20)
+        res = await searchTerms(query.trim(), page, 20, category)
       } else {
+
         res = await listTerms({ page, limit: 20, category: category || undefined })
       }
       setTerms(res.data.results || [])
@@ -125,14 +142,23 @@ export default function DictionaryPage() {
   useEffect(() => { fetchTerms() }, [fetchTerms])
 
   const handleSearch = (e) => {
-    e.preventDefault()
+    e?.preventDefault()
     setQuery(inputValue)
+    setShowSuggestions(false)
     setPage(1)
     if (inputValue.trim()) {
       navigate(`/dictionary?q=${encodeURIComponent(inputValue.trim())}`, { replace: true })
     } else {
       navigate('/dictionary', { replace: true })
     }
+  }
+
+  const handleSuggestionClick = (term) => {
+    setInputValue(term.en_term)
+    setQuery(term.en_term)
+    setShowSuggestions(false)
+    setPage(1)
+    navigate(`/dictionary?q=${encodeURIComponent(term.en_term)}`, { replace: true })
   }
 
   return (
@@ -183,7 +209,7 @@ export default function DictionaryPage() {
 
           {/* Search bar */}
           <div className="animate-fade-in-up" style={{ animationDelay:'160ms' }}>
-            <form onSubmit={handleSearch} style={{ display:'flex', gap:'10px', maxWidth:'680px', margin:'0 auto 28px' }}>
+            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 max-w-[680px] mx-auto mb-7">
               <div style={{ position:'relative', flex:1 }}>
                 <Search size={18} style={{
                   position:'absolute', left:'16px', top:'50%', transform:'translateY(-50%)',
@@ -207,6 +233,8 @@ export default function DictionaryPage() {
                     transition:'all 0.25s ease',
                   }}
                 />
+                
+
               </div>
               <button type="submit" style={{
                 padding:'14px 24px', borderRadius:'14px', fontWeight:700, fontSize:'15px',
@@ -219,6 +247,39 @@ export default function DictionaryPage() {
                 onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 4px 14px rgba(99,102,241,0.35)'; }}
               >Search</button>
             </form>
+
+            {/* Suggestions Box */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div style={{
+                display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '12px', marginBottom: '24px',
+                animation: 'popIn 0.2s ease both', justifyContent: 'flex-start', alignItems: 'center',
+                maxWidth: '680px', margin: '12px auto 24px auto',
+                background: 'rgba(255, 255, 255, 0.9)',
+                border: '1.5px solid rgba(99,102,241,0.15)',
+                borderRadius: '12px',
+                padding: '10px 16px',
+                boxShadow: '0 4px 12px rgba(99,102,241,0.08)',
+                backdropFilter: 'blur(8px)',
+                width: '100%', boxSizing: 'border-box'
+              }}>
+                <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: 600, marginRight: '6px' }}>Suggestions:</span>
+                {suggestions.map((sug, i) => (
+                  <span
+                    key={sug.id || i}
+                    onMouseDown={() => handleSuggestionClick(sug)}
+                    style={{
+                      cursor: 'pointer', transition: 'all 0.15s ease',
+                      fontWeight: 600, color: '#4f46e5', fontSize: '14px',
+                      padding: '4px 8px', borderRadius: '6px'
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    {sug.en_term}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Stats row */}
@@ -284,7 +345,7 @@ export default function DictionaryPage() {
             <LoadingSpinner size="lg" text="Searching terms..." />
           </div>
         ) : terms.length > 0 ? (
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(340px,1fr))', gap:'16px', marginBottom:'40px' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:'16px', marginBottom:'40px' }}>
             {terms.map((term, i) => <TermCard key={term.id || i} term={term} index={i} />)}
           </div>
         ) : (

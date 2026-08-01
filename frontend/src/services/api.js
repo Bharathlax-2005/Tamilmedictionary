@@ -6,8 +6,9 @@ const api = axios.create({
 })
 
 // ─── Dictionary ──────────────────────────────────────────────────────────────
-export const searchTerms = (q, page = 1, limit = 20) =>
-  api.get('/dictionary/search', { params: { q, page, limit } })
+export const searchTerms = (q, page = 1, limit = 20, category = '') =>
+  api.get('/dictionary/search', { params: { q, page, limit, category: category || undefined } })
+
 
 export const listTerms = (params = {}) =>
   api.get('/dictionary/terms', { params })

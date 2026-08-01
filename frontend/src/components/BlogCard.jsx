@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Calendar, User, ArrowRight } from 'lucide-react'
+import { Calendar, User, ArrowRight, BookOpen } from 'lucide-react'
 
 export default function BlogCard({ post, index }) {
   const date = post.published_at
@@ -37,9 +37,14 @@ export default function BlogCard({ post, index }) {
         {post.cover_image ? (
           <img src={post.cover_image} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.45s ease' }} />
         ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '52px' }}>📖</div>
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="w-14 h-14 rounded-2xl bg-indigo-100/70 flex items-center justify-center border border-indigo-200/60 text-primary-600 shadow-sm">
+              <BookOpen size={28} />
+            </div>
+          </div>
         )}
       </div>
+
 
       {/* Content */}
       <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>

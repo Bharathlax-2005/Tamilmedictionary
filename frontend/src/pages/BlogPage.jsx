@@ -34,7 +34,7 @@ export default function BlogPage() {
           <LoadingSpinner size="lg" text="Loading articles..." />
         ) : posts.length > 0 ? (
           <>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))', gap:'24px', marginBottom:'40px' }} className="stagger">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 stagger">
               {posts.map((post, i) => (
                 <div key={post.id} className="reveal">
                   <BlogCard post={post} index={i} />

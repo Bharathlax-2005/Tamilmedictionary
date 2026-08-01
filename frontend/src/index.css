@@ -154,8 +154,9 @@
   }
 
   /* ── Typography ───────────────────────────────────── */
-  .section-heading  { @apply text-3xl md:text-4xl font-bold text-slate-800 leading-tight; }
-  .section-subheading { @apply text-lg text-slate-500 leading-relaxed; }
+  .section-pad { @apply py-10 md:py-16 lg:py-24; }
+  .section-heading { @apply text-2xl md:text-3xl lg:text-4xl font-black text-slate-800 tracking-tight; }
+  .section-subheading { @apply text-base md:text-lg text-slate-500 font-medium leading-relaxed; }
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400;
   }
@@ -189,7 +190,6 @@
   .font-tamil { font-family:'Noto Sans Tamil', sans-serif; }
 
   /* ── Layout ───────────────────────────────────────── */
-  .section-pad { @apply py-16 md:py-24; }
   .blob        { @apply absolute rounded-full opacity-10 blur-3xl pointer-events-none; }
 
   /* ── Admin utilities ──────────────────────────────── */

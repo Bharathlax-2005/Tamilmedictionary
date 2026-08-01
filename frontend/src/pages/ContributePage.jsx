@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { submitContact } from '../services/api'
-import { Send, CheckCircle2, GitMerge, Sparkles } from 'lucide-react'
+import { Send, CheckCircle2, GitMerge, Sparkles, FileText, CheckCircle, Share2 } from 'lucide-react'
 import PageHero from '../components/PageHero'
 import useScrollReveal from '../hooks/useScrollReveal'
 
 const WHY_ITEMS = [
-  { icon: "📝", title: "Submit Medical Terms", desc: "Share English-Tamil term pairs with definitions" },
-  { icon: "🔍", title: "Review Translations", desc: "Help validate and improve existing translations" },
-  { icon: "📚", title: "Share Resources", desc: "Contribute medical glossaries or reference materials" },
+  { icon: <FileText size={22} className="text-primary-600" />, title: "Submit Medical Terms", desc: "Share English-Tamil term pairs with definitions" },
+  { icon: <CheckCircle size={22} className="text-emerald-600" />, title: "Review Translations", desc: "Help validate and improve existing translations" },
+  { icon: <Share2 size={22} className="text-purple-600" />, title: "Share Resources", desc: "Contribute medical glossaries or reference materials" },
 ]
+
 
 export default function ContributePage() {
   useScrollReveal()
@@ -51,14 +52,17 @@ export default function ContributePage() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }} className="stagger">
             {WHY_ITEMS.map((item, i) => (
-              <div key={i} className="reveal glass-card-light" style={{ padding: '20px', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                <div style={{ fontSize: '28px', lineHeight: 1, flexShrink: 0 }}>{item.icon}</div>
+              <div key={i} className="reveal glass-card-light" style={{ padding: '20px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div className="w-10 h-10 rounded-xl bg-indigo-50/80 flex items-center justify-center flex-shrink-0 border border-indigo-100/70 shadow-sm">
+                  {item.icon}
+                </div>
                 <div>
                   <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#1e1b4b', marginBottom: '4px' }}>{item.title}</h3>
                   <p style={{ fontSize: '13px', color: '#6b7280' }}>{item.desc}</p>
                 </div>
               </div>
             ))}
+
           </div>
         </div>
 

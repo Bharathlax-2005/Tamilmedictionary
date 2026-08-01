@@ -309,7 +309,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {members.map((member, i) => {
               const fbUrl = member.facebook || member.social?.facebook || "#"
               const twUrl = member.twitter || member.social?.twitter || "#"
@@ -320,49 +320,51 @@ export default function AboutPage() {
               return (
                 <div 
                   key={member.id || i} 
-                  className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
-                    {/* Member Image Card */}
-                    <div className="relative h-64 w-full bg-slate-100 overflow-hidden">
+                    {/* Compact Vertical Portrait Image Container */}
+                    <div className="relative h-52 sm:h-56 w-full bg-slate-900 overflow-hidden">
                       <img 
                         src={imgUrl} 
                         alt={member.name} 
                         className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
+                          e.target.onerror = null
                           e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
                       
                       {/* Role Badge on Image */}
-                      <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
-                        <span className="text-xs font-bold text-white bg-primary-600/90 backdrop-blur-md px-3 py-1 rounded-full shadow">
+                      <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-white bg-primary-600/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow">
                           {member.role}
                         </span>
                       </div>
                     </div>
 
-                    {/* Info & Bio */}
-                    <div className="p-6">
-                      <h3 className="text-xl font-extrabold text-slate-900 leading-snug mb-2">{member.name}</h3>
-                      <p className="text-sm text-slate-500 leading-relaxed">
+                    {/* Member Details */}
+                    <div className="p-4 space-y-1">
+                      <h3 className="text-base font-extrabold text-slate-900 leading-snug">{member.name}</h3>
+                      <p className="text-[11px] font-semibold text-primary-600">{member.role}</p>
+                      <p className="text-xs text-slate-500 leading-relaxed pt-1 line-clamp-3">
                         {bioText}
                       </p>
                     </div>
                   </div>
 
                   {/* Social Links Bar */}
-                  <div className="px-6 pb-6 pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Social Links</span>
-                    <div className="flex items-center gap-2">
+                  <div className="px-4 pb-4 pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Social</span>
+                    <div className="flex items-center gap-1.5">
                       {fbUrl && (
                         <a 
                           href={fbUrl} 
                           target="_blank" 
                           rel="noreferrer"
                           title="Facebook" 
-                          className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors"
+                          className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 hover:bg-blue-600 hover:text-white flex items-center justify-center transition-colors text-xs"
                         >
                           <FacebookIcon />
                         </a>
@@ -373,7 +375,7 @@ export default function AboutPage() {
                           target="_blank" 
                           rel="noreferrer"
                           title="Twitter / X" 
-                          className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-sky-500 hover:text-white flex items-center justify-center transition-colors"
+                          className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 hover:bg-sky-500 hover:text-white flex items-center justify-center transition-colors text-xs"
                         >
                           <TwitterIcon />
                         </a>
@@ -384,7 +386,7 @@ export default function AboutPage() {
                           target="_blank" 
                           rel="noreferrer"
                           title="LinkedIn" 
-                          className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-blue-700 hover:text-white flex items-center justify-center transition-colors"
+                          className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 hover:bg-blue-700 hover:text-white flex items-center justify-center transition-colors text-xs"
                         >
                           <LinkedInIcon />
                         </a>

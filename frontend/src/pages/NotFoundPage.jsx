@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Home, Search } from 'lucide-react'
+import { Home, Search, FileQuestion } from 'lucide-react'
 
 export default function NotFoundPage() {
   return (
@@ -24,10 +24,13 @@ export default function NotFoundPage() {
         </div>
 
         <div style={{ marginBottom: '8px', animation: 'fadeInUp 0.6s 0.2s both' }}>
-          <div style={{ fontSize: '60px', marginBottom: '16px' }}>📚</div>
+          <div className="w-20 h-20 rounded-3xl bg-white/90 backdrop-blur-md flex items-center justify-center border border-indigo-200/60 text-primary-600 shadow-xl mx-auto mb-4">
+            <FileQuestion size={40} />
+          </div>
           <h1 style={{ fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 900, color: '#1e1b4b', marginBottom: '10px' }}>
             Page Not Found
           </h1>
+
           <p style={{ fontSize: '15px', color: '#6b7280', maxWidth: '400px', margin: '0 auto 32px', lineHeight: 1.7 }}>
             The page you're looking for doesn't exist. Let's get you back on track.
           </p>
