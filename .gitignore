@@ -14,10 +14,13 @@ build/
 # Python
 __pycache__/
 *.pyc
-.pytest_cache/
-
 # IDE & OS
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Temporary & Scratch
+scratch/
+
+

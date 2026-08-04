@@ -24,14 +24,17 @@ async def seed():
     # ── Admin User ─────────────────────────────────────────────────────────
     existing_admin = await db.users.find_one({"username": settings.ADMIN_USERNAME})
     if not existing_admin:
-        await db.users.insert_one({
-            "username": settings.ADMIN_USERNAME,
-            "email": settings.ADMIN_EMAIL,
-            "hashed_password": hash_password(settings.ADMIN_PASSWORD),
-            "role": "admin",
-            "created_at": now,
-        })
-        print(f"✅ Admin user '{settings.ADMIN_USERNAME}' created")
+        if settings.ADMIN_EMAIL and settings.ADMIN_PASSWORD:
+            await db.users.insert_one({
+                "username": settings.ADMIN_USERNAME,
+                "email": settings.ADMIN_EMAIL,
+                "hashed_password": hash_password(settings.ADMIN_PASSWORD),
+                "role": "admin",
+                "created_at": now,
+            })
+            print(f"✅ Admin user '{settings.ADMIN_USERNAME}' created")
+        else:
+            print(f"⚠️  ADMIN_EMAIL or ADMIN_PASSWORD not configured in .env; skipping admin user creation")
     else:
         print(f"ℹ️  Admin user '{settings.ADMIN_USERNAME}' already exists")
 

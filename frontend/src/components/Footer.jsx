@@ -169,9 +169,12 @@ export default function Footer() {
         <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.30)' }}>
           © 2024 TamilMeDictionary.com. All Rights Reserved.
         </p>
-        <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.30)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-          Designed with <Heart size={11} color="#818cf8" fill="#818cf8" /> for Tamil Healthcare
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.30)', margin: 0 }}>
+            Powered by CubeAISolutions Tech Pvt Ltd
+          </p>
+          <img src="/images/cubeai_logo.png" alt="CubeAI Solutions Logo" style={{ height: '24px', opacity: 0.8, borderRadius: '4px' }} />
+        </div>
       </div>
     </footer>
   )
