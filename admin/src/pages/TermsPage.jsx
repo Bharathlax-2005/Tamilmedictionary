@@ -154,7 +154,12 @@ export default function TermsPage() {
     setExporting(true)
     try {
       const res = await exportTermsAdmin(format)
-      const blob = new Blob([res.data], { type: format === 'csv' ? 'text/csv' : 'application/json' })
+      const mimeTypes = {
+        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        csv: 'text/csv;charset=utf-8;',
+        json: 'application/json;charset=utf-8;'
+      }
+      const blob = new Blob([res.data], { type: mimeTypes[format] || 'application/octet-stream' })
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -231,12 +236,18 @@ export default function TermsPage() {
             <button disabled={exporting} className="btn-outline inline-flex items-center gap-2 text-xs py-2 px-3.5">
               <Download size={15} /> {exporting ? 'Exporting...' : 'Export Terms'}
             </button>
-            <div className="hidden group-hover:block absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg p-1 z-20 w-36">
-              <button onClick={() => handleExport('json')} className="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-lg">
-                Export JSON
+            <div className="hidden group-hover:block absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 z-20 w-48 animate-fade-in">
+              <button onClick={() => handleExport('xlsx')} className="w-full text-left px-3 py-2 text-xs font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-lg flex items-center justify-between">
+                <span>Excel (.xlsx)</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-semibold">Best for Excel</span>
               </button>
-              <button onClick={() => handleExport('csv')} className="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-lg">
-                Export CSV
+              <button onClick={() => handleExport('csv')} className="w-full text-left px-3 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg flex items-center justify-between">
+                <span>CSV (UTF-8)</span>
+                <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">Spreadsheet</span>
+              </button>
+              <button onClick={() => handleExport('json')} className="w-full text-left px-3 py-2 text-xs font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700 rounded-lg flex items-center justify-between">
+                <span>JSON</span>
+                <span className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">Raw Data</span>
               </button>
             </div>
           </div>

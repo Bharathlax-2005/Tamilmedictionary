@@ -6,6 +6,7 @@ from pathlib import Path
 from .database import connect_db, close_db
 from .config import settings
 from .routers import auth, dictionary, pages, blog, services, stats, contact, shop, admin, team, collections, clients
+from .excel_service import excel_dictionary
 
 
 BASE_DIR = Path(__file__).resolve().parents[0]
@@ -16,8 +17,13 @@ UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_db()
+    try:
+        excel_dictionary.load_if_needed()
+    except Exception as e:
+        print(f"Warning: Could not pre-load XLSX dictionary on startup: {e}")
     yield
     await close_db()
+
 
 
 app = FastAPI(

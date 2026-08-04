@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 from ..database import get_db
 from ..models import MedicalTermCreate, MedicalTermUpdate
 from ..security import get_current_admin
+from ..excel_service import excel_dictionary
+from ..google_sheet_service import google_sheet_dictionary
 
 router = APIRouter(prefix="/api/dictionary", tags=["Dictionary"])
 
@@ -28,6 +30,27 @@ async def search_terms(
     category: Optional[str] = None,
     featured: Optional[bool] = None,
 ):
+    # 1. Check Google Sheet / Apps Script cache if active
+    if google_sheet_dictionary._cached_terms or google_sheet_dictionary.appscript_url:
+        return google_sheet_dictionary.search_terms(
+            q=q,
+            page=page,
+            limit=limit,
+            category=category,
+            featured=featured,
+        )
+
+    # 2. Connect directly to the XLSX dataset when available
+    if excel_dictionary.is_file_available():
+        return excel_dictionary.search_terms(
+            q=q,
+            page=page,
+            limit=limit,
+            category=category,
+            featured=featured,
+        )
+
+    # 3. Fallback to MongoDB
     db = get_db()
     skip = (page - 1) * limit
     q_clean = q.strip()
@@ -74,6 +97,25 @@ async def list_terms(
     category: Optional[str] = None,
     featured: Optional[bool] = None,
 ):
+    # 1. Check Google Sheet / Apps Script cache if active
+    if google_sheet_dictionary._cached_terms or google_sheet_dictionary.appscript_url:
+        return google_sheet_dictionary.list_terms(
+            page=page,
+            limit=limit,
+            category=category,
+            featured=featured,
+        )
+
+    # 2. Connect directly to the XLSX dataset when available
+    if excel_dictionary.is_file_available():
+        return excel_dictionary.list_terms(
+            page=page,
+            limit=limit,
+            category=category,
+            featured=featured,
+        )
+
+    # 3. Fallback to MongoDB
     db = get_db()
     skip = (page - 1) * limit
     query = {}
@@ -95,15 +137,48 @@ async def list_terms(
 
 @router.get("/categories")
 async def get_categories():
+    # 1. Check Google Sheet / Apps Script cache if active
+    if google_sheet_dictionary._cached_terms or google_sheet_dictionary.appscript_url:
+        cats = google_sheet_dictionary.get_categories()
+        if cats:
+            return {"categories": cats}
+
+    # 2. Connect directly to the XLSX dataset when available
+    if excel_dictionary.is_file_available():
+        cats = excel_dictionary.get_categories()
+        if cats:
+            return {"categories": cats}
+
+    # 3. Fallback to MongoDB
     db = get_db()
     categories = await db.terms.distinct("category")
     clean_categories = sorted([c for c in categories if c])
     return {"categories": clean_categories}
 
 
+@router.post("/sync-google-sheet")
+async def sync_google_sheet(
+    appscript_url: Optional[str] = Query(None),
+    _=Depends(get_current_admin),
+):
+    result = google_sheet_dictionary.sync(custom_url=appscript_url)
+    return result
+
+
+@router.get("/google-sheet-status")
+async def google_sheet_status():
+    return {
+        "appscript_url_configured": bool(google_sheet_dictionary.appscript_url),
+        "cached_terms_count": len(google_sheet_dictionary._cached_terms),
+        "categories_count": len(google_sheet_dictionary._categories),
+        "sheet_id": google_sheet_dictionary.sheet_id,
+        "gid": google_sheet_dictionary.gid,
+    }
+
+
 @router.get("/export")
 async def export_terms(
-    format: str = Query("json", regex="^(json|csv)$"),
+    format: str = Query("json", regex="^(json|csv|xlsx|excel)$"),
     _=Depends(get_current_admin),
 ):
     db = get_db()
@@ -113,9 +188,34 @@ async def export_terms(
     if format == "json":
         json_data = json.dumps(terms, indent=2, default=str, ensure_ascii=False)
         return Response(
-            content=json_data,
-            media_type="application/json",
+            content=json_data.encode("utf-8"),
+            media_type="application/json; charset=utf-8",
             headers={"Content-Disposition": 'attachment; filename="tamilmedictionary_terms.json"'},
+        )
+    elif format in ("xlsx", "excel"):
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Medical Terms"
+        ws.append(["en_term", "ta_term", "category", "definition", "ta_definition", "tags", "is_featured"])
+        for t in terms:
+            tags_str = ", ".join(t.get("tags", [])) if isinstance(t.get("tags"), list) else str(t.get("tags", ""))
+            ws.append([
+                t.get("en_term", ""),
+                t.get("ta_term", ""),
+                t.get("category", "General"),
+                t.get("definition", ""),
+                t.get("ta_definition", ""),
+                tags_str,
+                "true" if t.get("is_featured") else "false",
+            ])
+        buffer = io.BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)
+        return Response(
+            content=buffer.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": 'attachment; filename="tamilmedictionary_terms.xlsx"'},
         )
     else:
         output = io.StringIO()
@@ -132,10 +232,12 @@ async def export_terms(
                 tags_str,
                 "true" if t.get("is_featured") else "false",
             ])
-        output.seek(0)
+        # Prepend UTF-8 BOM (\ufeff / b'\xef\xbb\xbf') so Microsoft Excel and other spreadsheet apps
+        # automatically detect UTF-8 encoding and render Tamil text correctly without mojibake.
+        bom_utf8_bytes = "\ufeff".encode("utf-8") + output.getvalue().encode("utf-8")
         return Response(
-            content=output.getvalue(),
-            media_type="text/csv",
+            content=bom_utf8_bytes,
+            media_type="text/csv; charset=utf-8",
             headers={"Content-Disposition": 'attachment; filename="tamilmedictionary_terms.csv"'},
         )
 
