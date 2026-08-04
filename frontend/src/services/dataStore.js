@@ -351,10 +351,15 @@ function normalizeSheetTerms(rawTerms) {
   return rawTerms
     .filter(t => t && (t.en_term || t.ta_term))
     .map((t, idx) => {
-      const en = (t.en_term || '').toString().trim()
-      const ta = (t.ta_term || '').toString().trim()
+      let en = (t.en_term || '').toString().trim()
+      let ta = (t.ta_term || '').toString().trim()
       const def = (t.definition || '').toString().trim()
       const taDef = (t.ta_definition || '').toString().trim()
+
+      // Clean leading apostrophe or period artifacts from scanned OCR text
+      if (en.startsWith("'") && en.length > 1) en = en.substring(1).trim()
+      if (en.startsWith(".") && en.length > 1) en = en.substring(1).trim()
+
       const cat = (t.category && t.category.toString().trim() && t.category.toString().trim() !== 'General')
         ? t.category.toString().trim()
         : 'Medical Terms'
@@ -371,17 +376,20 @@ function normalizeSheetTerms(rawTerms) {
         en_term: en,
         ta_term: ta,
         category: cat,
-        definition: def,
+        definition: (def === 'None' || def === '.') ? '' : def,
         ta_definition: taDef,
         tags,
         is_featured: t.is_featured === true || t.is_featured === 'true' || idx < 12,
       }
     })
-    .filter(t => t.en_term.length > 0 || t.ta_term.length > 0)
+    .filter(t => {
+      if (!t.en_term && !t.ta_term) return false
+      // Filter out solitary punctuation marks
+      if (t.en_term.length === 1 && !/[a-zA-Z0-9\u0B80-\u0BFF]/.test(t.en_term)) return false
+      return true
+    })
 }
 
-/**
- * Loads dictionary dataset from Google Apps Script Web App (live from Google Sheet),
 /**
  * Fetches dictionary data directly from the live Google Apps Script Web App URL.
  * No static JSON conversion file is used.
@@ -397,9 +405,10 @@ export async function loadFullDictionaryDataset(forceRefresh = false) {
   loadingPromise = (async () => {
     // 1. Direct Live HTTP fetch from Google Apps Script Web App (connected to your Google Sheet)
     try {
+      console.log('Fetching live dictionary terms from Google Apps Script...')
       const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: 'GET',
-        headers: { 'Accept': 'application/json' },
+        redirect: 'follow',
       })
       if (response.ok) {
         const rawData = await response.json()
@@ -408,15 +417,19 @@ export async function loadFullDictionaryDataset(forceRefresh = false) {
           termsDataset = normalized
           isDatasetLoaded = true
           lastSyncTimestamp = new Date().toISOString()
+          console.log(`Successfully loaded ${termsDataset.length} live terms from Google Sheet!`)
           return termsDataset
         }
+      } else {
+        console.warn('Apps Script response not OK:', response.status, response.statusText)
       }
     } catch (err) {
-      console.warn('Direct Google Apps Script fetch warning:', err)
+      console.error('Direct Google Apps Script fetch error:', err)
     }
 
     // 2. Emergency fallback to built-in seed terms if offline without internet
     if (termsDataset.length === 0) {
+      console.log('Using local fallback dataset')
       termsDataset = normalizeSheetTerms(SEED_MEDICAL_TERMS)
       isDatasetLoaded = true
     }
