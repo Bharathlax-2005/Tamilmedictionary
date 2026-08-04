@@ -9,3 +9,4 @@ from .shop import router as shop
 from .admin import router as admin
 from .team import router as team
 from .collections import router as collections
+from .clients import router as clients

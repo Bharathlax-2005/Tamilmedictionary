@@ -127,32 +127,17 @@ export default function Navbar() {
             <Link
               to="/login"
               style={{
-                display: 'flex', alignItems: 'center', gap: '6px',
-                padding: '7px 14px', borderRadius: '10px',
-                border: '1.5px solid rgba(99,102,241,0.20)',
-                color: '#4b5563', fontSize: '13px', fontWeight: 600,
-                transition: 'all 0.2s ease', textDecoration: 'none',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.color = '#4f46e5'; e.currentTarget.style.background = 'rgba(99,102,241,0.05)'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.20)'; e.currentTarget.style.color = '#4b5563'; e.currentTarget.style.background = ''; }}
-            >
-              <LogIn size={14} /> Login
-            </Link>
-            <Link
-              to="/contact"
-              style={{
                 display: 'inline-flex', alignItems: 'center', gap: '6px',
                 padding: '8px 18px', borderRadius: '10px',
                 background: 'linear-gradient(135deg,#6366f1,#4f46e5)',
                 color: 'white', fontSize: '13px', fontWeight: 700,
                 boxShadow: '0 4px 14px rgba(99,102,241,0.35)',
                 transition: 'all 0.22s ease', textDecoration: 'none',
-                position: 'relative', overflow: 'hidden',
               }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(99,102,241,0.45)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 14px rgba(99,102,241,0.35)'; }}
             >
-              Get Started
+              <LogIn size={15} /> Login
             </Link>
           </div>
 
@@ -209,17 +194,8 @@ export default function Navbar() {
             ))}
           </div>
           <div style={{ paddingTop: '12px', borderTop: '1px solid rgba(99,102,241,0.08)', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <Link to="/login" style={{
-              padding: '11px 14px', borderRadius: '12px',
-              border: '1.5px solid rgba(99,102,241,0.18)', color: '#4b5563',
-              textAlign: 'center', fontWeight: 700, fontSize: '14px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-              textDecoration: 'none',
-            }}>
-              <LogIn size={15} /> Login
-            </Link>
-            <Link to="/contact" className="btn-primary" style={{ justifyContent: 'center', fontSize: '14px' }}>
-              Get Started
+            <Link to="/login" className="btn-primary" style={{ justifyContent: 'center', fontSize: '14px', gap: '6px' }}>
+              <LogIn size={16} /> Login
             </Link>
           </div>
         </div>

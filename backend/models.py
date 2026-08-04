@@ -297,3 +297,38 @@ class UserLoginRequest(BaseModel):
     password: str
     is_admin: bool = False
 
+
+# ─── Client / Partner ────────────────────────────────────────────────────────
+
+class Client(BaseModel):
+    name: str
+    category: str = "Healthcare Partner"
+    location: Optional[str] = None
+    logo_text: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    order: int = 0
+    created_at: datetime = Field(default_factory=now_utc)
+    updated_at: datetime = Field(default_factory=now_utc)
+
+
+class ClientCreate(BaseModel):
+    name: str
+    category: str = "Healthcare Partner"
+    location: Optional[str] = None
+    logo_text: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    order: int = 0
+
+
+class ClientUpdate(BaseModel):
+    name: Optional[str] = None
+    category: Optional[str] = None
+    location: Optional[str] = None
+    logo_text: Optional[str] = None
+    logo_url: Optional[str] = None
+    website: Optional[str] = None
+    order: Optional[int] = None
+
+

@@ -23,4 +23,6 @@ Thumbs.db
 # Temporary & Scratch
 scratch/
 
-
+# Deployment & Vercel
+vercel.json
+.vercel

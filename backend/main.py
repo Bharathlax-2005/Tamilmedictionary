@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from .database import connect_db, close_db
 from .config import settings
-from .routers import auth, dictionary, pages, blog, services, stats, contact, shop, admin, team, collections
+from .routers import auth, dictionary, pages, blog, services, stats, contact, shop, admin, team, collections, clients
 
 
 BASE_DIR = Path(__file__).resolve().parents[0]
@@ -48,6 +48,7 @@ app.include_router(shop)
 app.include_router(admin)
 app.include_router(team)
 app.include_router(collections)
+app.include_router(clients)
 
 app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 

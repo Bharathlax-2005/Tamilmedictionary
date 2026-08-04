@@ -3,19 +3,19 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
   LayoutDashboard, BookOpen, FileText, Wrench, BarChart2,
-  Mail, ShoppingBag, FileEdit, LogOut, BookMarked, Users, Menu, X
+  Mail, ShoppingBag, LogOut, BookMarked, Users, Menu, X, Building2
 } from 'lucide-react'
 
 const links = [
   { to: '/admin', icon: <LayoutDashboard size={18} />, label: 'Dashboard', end: true },
   { to: '/admin/terms', icon: <BookOpen size={18} />, label: 'Dictionary Terms' },
   { to: '/admin/team', icon: <Users size={18} />, label: 'Team Management' },
+  { to: '/admin/clients', icon: <Building2 size={18} />, label: 'Our Clients' },
   { to: '/admin/blog', icon: <FileText size={18} />, label: 'Blog Posts' },
   { to: '/admin/services', icon: <Wrench size={18} />, label: 'Services' },
   { to: '/admin/stats', icon: <BarChart2 size={18} />, label: 'Statistics' },
   { to: '/admin/contacts', icon: <Mail size={18} />, label: 'Contact Submissions' },
   { to: '/admin/shop', icon: <ShoppingBag size={18} />, label: 'Shop / Products' },
-  { to: '/admin/pages', icon: <FileEdit size={18} />, label: 'Page Content (CMS)' },
   { to: '/admin/collections', icon: <FileText size={18} />, label: 'Collections' },
 ]
 

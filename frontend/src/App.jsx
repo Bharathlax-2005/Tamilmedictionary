@@ -27,12 +27,12 @@ import AdminLayout from '@admin/components/Layout'
 import DashboardPage from '@admin/pages/DashboardPage'
 import AdminTermsPage from '@admin/pages/TermsPage'
 import AdminTeamPage from '@admin/pages/TeamPage'
+import AdminClientsPage from '@admin/pages/ClientsPage'
 import AdminBlogPage from '@admin/pages/BlogPage'
 import AdminServicesPage from '@admin/pages/ServicesPage'
 import AdminStatsPage from '@admin/pages/StatsPage'
 import AdminContactsPage from '@admin/pages/ContactsPage'
 import AdminShopPage from '@admin/pages/ShopPage'
-import AdminPagesPage from '@admin/pages/PagesPage'
 import CollectionsManagerPage from '@admin/pages/CollectionsManagerPage'
 
 // Wrapper that hides Navbar/Footer on /admin routes
@@ -82,12 +82,12 @@ function App() {
                       <Route index              element={<DashboardPage />} />
                       <Route path="terms"       element={<AdminTermsPage />} />
                       <Route path="team"        element={<AdminTeamPage />} />
+                      <Route path="clients"     element={<AdminClientsPage />} />
                       <Route path="blog"        element={<AdminBlogPage />} />
                       <Route path="services"    element={<AdminServicesPage />} />
                       <Route path="stats"       element={<AdminStatsPage />} />
                       <Route path="contacts"    element={<AdminContactsPage />} />
                       <Route path="shop"        element={<AdminShopPage />} />
-                      <Route path="pages"       element={<AdminPagesPage />} />
                       <Route path="collections" element={<CollectionsManagerPage />} />
                     </Routes>
                   </AdminLayout>

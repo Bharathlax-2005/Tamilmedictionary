@@ -22,7 +22,8 @@ class RefreshRequest(BaseModel):
 @router.post("/login", response_model=TokenResponse)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     db = get_db()
-    user = await db.users.find_one({"username": form_data.username})
+    identifier = form_data.username.strip()
+    user = await db.users.find_one({"$or": [{"username": identifier}, {"email": identifier}]})
     if not user or not verify_password(form_data.password, user["hashed_password"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

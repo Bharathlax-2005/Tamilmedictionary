@@ -124,3 +124,11 @@ export const updateCollection = (id, formData, onProgress) =>
 
 export const deleteCollection = (id) => api.delete(`/api/collections/${id}`)
 
+// Clients / Partners
+export const getClients = () => api.get('/api/clients/')
+export const createClient = (d) => api.post('/api/clients', d)
+export const updateClient = (id, d) => api.put(`/api/clients/${id}`, d)
+export const deleteClient = (id) => api.delete(`/api/clients/${id}`)
+export const uploadClientLogo = (formData) => api.post('/api/clients/upload-logo', formData)
+export const reorderClients = (list) => api.post('/api/clients/reorder', list)
+

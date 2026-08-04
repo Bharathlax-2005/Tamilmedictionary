@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { submitContact, getTeamMembers } from '../services/api'
+import { submitContact, getTeamMembers, getClients } from '../services/api'
 import { 
   Mail, MapPin, Send, CheckCircle2, Building2, Play, Image as ImageIcon, 
-  Video, Sparkles, ArrowRight, Heart, ShieldCheck, Award, HelpCircle, FileText
+  Video, Sparkles, ArrowRight, Heart, ShieldCheck, Award, HelpCircle, FileText, Globe, ExternalLink
 } from 'lucide-react'
 
 
@@ -95,12 +95,23 @@ export default function AboutPage() {
   const [activeMediaTab, setActiveMediaTab] = useState('photo')
   const [isVideoPlaying, setIsVideoPlaying] = useState(false)
   const [members, setMembers] = useState(TEAM_MEMBERS)
+  const [clients, setClients] = useState(CLIENTS)
 
   useEffect(() => {
     getTeamMembers()
       .then(res => {
         if (Array.isArray(res.data) && res.data.length > 0) {
           setMembers(res.data)
+        }
+      })
+      .catch(() => {
+        // keep fallback default list
+      })
+
+    getClients()
+      .then(res => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setClients(res.data)
         }
       })
       .catch(() => {
@@ -406,7 +417,7 @@ export default function AboutPage() {
               Partnerships
             </span>
             <h2 className="text-3xl font-extrabold text-slate-900">
-              Our Clients
+              Our Clients & Partners
             </h2>
             <p className="text-slate-500 mt-2 text-sm sm:text-base">
               Trusted by medical institutions, educational bodies, and healthcare partners across Tamil Nadu and internationally.
@@ -414,18 +425,57 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {CLIENTS.map((client, i) => (
-              <div 
-                key={i} 
-                className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow text-center flex flex-col items-center justify-center gap-2 group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
-                  <Building2 size={20} />
-                </div>
-                <h4 className="text-xs font-bold text-slate-800 leading-tight">{client.name}</h4>
-                <span className="text-[10px] text-slate-400">{client.category}</span>
-              </div>
-            ))}
+            {clients.map((client, i) => {
+              const CardWrapper = client.website ? 'a' : 'div'
+              const wrapperProps = client.website ? {
+                href: client.website.startsWith('http') ? client.website : `https://${client.website}`,
+                target: "_blank",
+                rel: "noreferrer",
+              } : {}
+
+              return (
+                <CardWrapper 
+                  key={client.id || i} 
+                  {...wrapperProps}
+                  className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md hover:border-primary-200 transition-all text-center flex flex-col items-center justify-between gap-3 group relative"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-primary-50 border border-primary-100/60 flex items-center justify-center p-1.5 overflow-hidden group-hover:scale-105 group-hover:bg-primary-100/60 transition-transform">
+                    {client.logo_url ? (
+                      <img 
+                        src={client.logo_url} 
+                        alt={client.name} 
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          e.target.onerror = null
+                          e.target.style.display = 'none'
+                        }}
+                      />
+                    ) : (
+                      <Building2 size={22} className="text-primary-600" />
+                    )}
+                  </div>
+                  
+                  <div className="space-y-1 w-full">
+                    <h4 className="text-xs font-bold text-slate-800 leading-tight group-hover:text-primary-700 transition-colors line-clamp-2">
+                      {client.name}
+                    </h4>
+                    <span className="inline-block text-[10px] font-semibold text-slate-500 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+                      {client.category || 'Partner'}
+                    </span>
+                    {client.location && (
+                      <p className="text-[10px] text-slate-400 truncate">{client.location}</p>
+                    )}
+                  </div>
+
+                  {client.website && (
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-primary-600 font-semibold flex items-center gap-1 mt-1">
+                      <span>Visit</span>
+                      <ExternalLink size={10} />
+                    </div>
+                  )}
+                </CardWrapper>
+              )
+            })}
           </div>
         </section>
 

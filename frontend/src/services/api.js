@@ -51,5 +51,10 @@ export const getTeamMembers = () =>
 export const getCollections = () =>
   api.get('/collections/')
 
+// ─── Clients / Partners ─────────────────────────────────────────────────────
+export const getClients = () =>
+  api.get('/clients/')
+
 export default api
+
 

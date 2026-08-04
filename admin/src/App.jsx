@@ -11,8 +11,8 @@ import ServicesPage from './pages/ServicesPage'
 import StatsPage from './pages/StatsPage'
 import ContactsPage from './pages/ContactsPage'
 import ShopPage from './pages/ShopPage'
-import PagesPage from './pages/PagesPage'
 import TeamPage from './pages/TeamPage'
+import ClientsPage from './pages/ClientsPage'
 import CollectionsManagerPage from './pages/CollectionsManagerPage'
 
 export default function App() {
@@ -30,12 +30,12 @@ export default function App() {
                     <Route path="/" element={<DashboardPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/team" element={<TeamPage />} />
+                    <Route path="/clients" element={<ClientsPage />} />
                     <Route path="/blog" element={<BlogPage />} />
                     <Route path="/services" element={<ServicesPage />} />
                     <Route path="/stats" element={<StatsPage />} />
                     <Route path="/contacts" element={<ContactsPage />} />
                     <Route path="/shop" element={<ShopPage />} />
-                    <Route path="/pages" element={<PagesPage />} />
                     <Route path="/collections" element={<CollectionsManagerPage />} />
                   </Routes>
                 </Layout>

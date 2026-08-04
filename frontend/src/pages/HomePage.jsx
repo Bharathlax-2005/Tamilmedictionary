@@ -875,7 +875,7 @@ export default function HomePage() {
               <Search size={18} /> Search Dictionary
             </a>
             <a href="/contact" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-800/50 text-white font-semibold rounded-xl border border-white/30 hover:bg-primary-800/70 transition-all duration-200">
-              Get Started <ArrowRight size={18} />
+              Contact Us <ArrowRight size={18} />
             </a>
           </div>
         </div>

@@ -353,6 +353,78 @@ async def seed():
         ])
         print("✅ Team members seeded")
 
+    # ── Clients / Partners ──────────────────────────────────────────────────
+    if await db.clients.count_documents({}) == 0:
+        await db.clients.insert_many([
+            {
+                "name": "Apollo Hospitals Network",
+                "category": "Healthcare Partner",
+                "location": "Chennai / Pan-India",
+                "logo_text": "Apollo Hospitals",
+                "logo_url": None,
+                "website": "https://www.apollohospitals.com",
+                "order": 1,
+                "created_at": now,
+                "updated_at": now,
+            },
+            {
+                "name": "Madras Medical College",
+                "category": "Academic Partner",
+                "location": "Chennai",
+                "logo_text": "MMC Chennai",
+                "logo_url": None,
+                "website": "",
+                "order": 2,
+                "created_at": now,
+                "updated_at": now,
+            },
+            {
+                "name": "Tamil Nadu Dr. M.G.R. Medical University",
+                "category": "University Partner",
+                "location": "Guindy, Chennai",
+                "logo_text": "MGR Med University",
+                "logo_url": None,
+                "website": "",
+                "order": 3,
+                "created_at": now,
+                "updated_at": now,
+            },
+            {
+                "name": "Global Health Research Institute",
+                "category": "Research Org",
+                "location": "Coimbatore",
+                "logo_text": "GHRI India",
+                "logo_url": None,
+                "website": "",
+                "order": 4,
+                "created_at": now,
+                "updated_at": now,
+            },
+            {
+                "name": "BioMed Tamil Publications",
+                "category": "Publishing Partner",
+                "location": "Madurai",
+                "logo_text": "BioMed Tamil",
+                "logo_url": None,
+                "website": "",
+                "order": 5,
+                "created_at": now,
+                "updated_at": now,
+            },
+            {
+                "name": "National Health Services (Tamil Div.)",
+                "category": "Institutional",
+                "location": "UK / International",
+                "logo_text": "NHS Tamil Desk",
+                "logo_url": None,
+                "website": "",
+                "order": 6,
+                "created_at": now,
+                "updated_at": now,
+            },
+        ])
+        print("✅ Clients seeded")
+
 
     # ── Create Indexes ─────────────────────────────────────────────────────
     await db.terms.create_index([("en_term", "text"), ("ta_term", "text"), ("tags", "text")])
