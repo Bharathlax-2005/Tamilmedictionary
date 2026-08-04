@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { Search, ChevronLeft, ChevronRight, BookOpen, Filter, Sparkles, ArrowRight } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, BookOpen, Filter, Sparkles } from 'lucide-react'
 import { searchTerms, listTerms, getCategories } from '../services/api'
 import LoadingSpinner from '../components/LoadingSpinner'
 import useScrollReveal from '../hooks/useScrollReveal'
@@ -12,7 +12,7 @@ function StatBadge({ value, label }) {
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       padding: '14px 20px',
-      background: 'rgba(255,255,255,0.80)',
+      background: 'rgba(255,255,255,0.85)',
       border: '1.5px solid rgba(99,102,241,0.14)',
       borderRadius: '16px',
       backdropFilter: 'blur(12px)',
@@ -23,7 +23,7 @@ function StatBadge({ value, label }) {
       onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 2px 12px rgba(99,102,241,0.07)'; }}
     >
       <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#4f46e5', lineHeight: 1 }}>{value}</span>
-      <span style={{ fontSize: '0.71rem', color: '#9ca3af', marginTop: '4px' }}>{label}</span>
+      <span style={{ fontSize: '0.71rem', color: '#64748b', marginTop: '4px', fontWeight: 600 }}>{label}</span>
     </div>
   )
 }
@@ -32,43 +32,61 @@ function StatBadge({ value, label }) {
 function TermCard({ term, index }) {
   return (
     <div
-      className="reveal term-card"
+      className="reveal term-card group hover:-translate-y-1 transition-all duration-300"
       style={{
-        animationDelay: `${index * 40}ms`,
-        background: 'white', borderRadius: '18px',
-        padding: '20px', display: 'flex', gap: '16px', alignItems: 'flex-start',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        animationDelay: `${(index % 20) * 30}ms`,
+        background: 'white',
+        borderRadius: '20px',
+        padding: '22px',
+        display: 'flex',
+        gap: '16px',
+        alignItems: 'flex-start',
+        border: '1.5px solid #f1f5f9',
+        boxShadow: '0 4px 16px rgba(15,23,42,0.04)',
       }}
     >
       <div style={{
-        width: '44px', height: '44px', borderRadius: '14px', flexShrink: 0,
-        background: 'linear-gradient(135deg,rgba(99,102,241,0.10),rgba(59,130,246,0.08))',
+        width: '46px', height: '46px', borderRadius: '14px', flexShrink: 0,
+        background: 'linear-gradient(135deg,rgba(99,102,241,0.12),rgba(59,130,246,0.10))',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        border: '1.5px solid rgba(99,102,241,0.12)',
+        border: '1.5px solid rgba(99,102,241,0.15)',
       }}>
-        <BookOpen size={18} color="#6366f1" />
+        <BookOpen size={20} className="text-primary-600 group-hover:scale-110 transition-transform duration-200" />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '4px' }}>
-          <h3 style={{ fontWeight: 700, color: '#1e1b4b', fontSize: '15px', margin: 0 }}>{term.en_term}</h3>
+          <h3 style={{ fontWeight: 800, color: '#0f172a', fontSize: '16px', margin: 0, letterSpacing: '-0.01em' }}>
+            {term.en_term}
+          </h3>
           {term.category && (
             <span style={{
-              fontSize: '10px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px',
-              background: 'rgba(99,102,241,0.08)', color: '#6366f1',
+              fontSize: '10.5px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px',
+              background: 'rgba(99,102,241,0.08)', color: '#4f46e5',
               border: '1px solid rgba(99,102,241,0.15)', flexShrink: 0,
-            }}>{term.category}</span>
+            }}>
+              {term.category}
+            </span>
           )}
         </div>
-        <p className="font-tamil" style={{ color: '#4f46e5', fontWeight: 700, fontSize: '1.1rem', margin: '0 0 4px' }}>{term.ta_term}</p>
+        <p className="font-tamil" style={{ color: '#4338ca', fontWeight: 800, fontSize: '1.2rem', margin: '4px 0 6px', lineHeight: 1.3 }}>
+          {term.ta_term}
+        </p>
         {term.definition && (
-          <p style={{ fontSize: '12px', color: '#9ca3af', lineHeight: 1.6, margin: 0 }}>{term.definition}</p>
+          <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.6, margin: '4px 0 0' }}>
+            {term.definition}
+          </p>
+        )}
+        {term.ta_definition && term.ta_definition !== term.definition && (
+          <p className="font-tamil" style={{ fontSize: '12.5px', color: '#64748b', lineHeight: 1.5, margin: '4px 0 0' }}>
+            {term.ta_definition}
+          </p>
         )}
         {term.tags?.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '8px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '10px' }}>
             {term.tags.map(tag => (
               <span key={tag} style={{
                 fontSize: '10px', padding: '2px 8px', borderRadius: '999px',
-                background: '#f1f5f9', color: '#64748b',
+                background: '#f1f5f9', color: '#64748b', fontWeight: 600,
               }}>{tag}</span>
             ))}
           </div>
@@ -94,7 +112,8 @@ export default function DictionaryPage() {
   const [focused, setFocused]     = useState(false)
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
-  const debouncedInput = useDebounce(inputValue, 250)
+  const debouncedInput = useDebounce(inputValue, 200)
+
   useEffect(() => {
     getCategories().then(r => setCategories(r.data.categories || []))
   }, [])
@@ -106,10 +125,10 @@ export default function DictionaryPage() {
     setPage(1)
   }, [searchParams])
 
-  // Fetch suggestions
+  // Fetch suggestions as user types
   useEffect(() => {
     if (debouncedInput.trim() && focused) {
-      searchTerms(debouncedInput.trim(), 1, 5, category).then(res => {
+      searchTerms(debouncedInput.trim(), 1, 6, category).then(res => {
         setSuggestions(res.data.results || [])
         setShowSuggestions(true)
       }).catch(err => console.error(err))
@@ -124,10 +143,9 @@ export default function DictionaryPage() {
     try {
       let res
       if (query.trim()) {
-        res = await searchTerms(query.trim(), page, 20, category)
+        res = await searchTerms(query.trim(), page, 24, category)
       } else {
-
-        res = await listTerms({ page, limit: 20, category: category || undefined })
+        res = await listTerms({ page, limit: 24, category: category || undefined })
       }
       setTerms(res.data.results || [])
       setTotal(res.data.total || 0)
@@ -176,16 +194,17 @@ export default function DictionaryPage() {
         <div style={{ position:'absolute',bottom:'-30px',left:'10%',width:'160px',height:'160px',borderRadius:'50%',background:'radial-gradient(circle,rgba(59,130,246,0.10) 0%,transparent 70%)',filter:'blur(25px)',animation:'floatY 8s ease-in-out infinite 1s' }} />
 
         <div style={{ maxWidth:'900px', margin:'0 auto', textAlign:'center', position:'relative', zIndex:1 }}>
+          
           {/* Badge */}
-          <div className="animate-fade-in-up" style={{ marginBottom:'16px' }}>
+          <div className="animate-fade-in-up flex items-center justify-center mb-4">
             <span style={{
               display:'inline-flex', alignItems:'center', gap:'6px',
-              padding:'5px 16px', borderRadius:'999px', fontSize:'12px', fontWeight:700,
+              padding:'6px 18px', borderRadius:'999px', fontSize:'12.5px', fontWeight:700,
               background:'rgba(99,102,241,0.10)', color:'#4f46e5',
               border:'1.5px solid rgba(99,102,241,0.18)',
               animation:'popIn 0.4s ease both',
             }}>
-              <Sparkles size={13} /> Medical Dictionary
+              <Sparkles size={14} /> Medical Dictionary
             </span>
           </div>
 
@@ -202,14 +221,14 @@ export default function DictionaryPage() {
               </span>
               {' '}Dictionary
             </h1>
-            <p style={{ color:'#6b7280', fontSize:'1rem', marginBottom:'32px' }}>
+            <p style={{ color:'#6b7280', fontSize:'1rem', marginBottom:'28px' }}>
               Search from 10,000+ medical terms professionally translated into Tamil
             </p>
           </div>
 
           {/* Search bar */}
           <div className="animate-fade-in-up" style={{ animationDelay:'160ms' }}>
-            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 max-w-[680px] mx-auto mb-7">
+            <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 max-w-[680px] mx-auto mb-4">
               <div style={{ position:'relative', flex:1 }}>
                 <Search size={18} style={{
                   position:'absolute', left:'16px', top:'50%', transform:'translateY(-50%)',
@@ -221,69 +240,69 @@ export default function DictionaryPage() {
                   value={inputValue}
                   onChange={e => setInputValue(e.target.value)}
                   onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
-                  placeholder="Search medical terms in English or Tamil..."
+                  onBlur={() => setTimeout(() => setFocused(false), 250)}
+                  placeholder="Search medical terms in English or Tamil (e.g., Anatomy, இதயம்)..."
                   style={{
-                    width:'100%', padding:'14px 16px 14px 48px',
-                    background:'rgba(255,255,255,0.92)',
-                    border: focused ? '2px solid #6366f1' : '2px solid rgba(99,102,241,0.15)',
-                    borderRadius:'14px', fontSize:'15px', color:'#1e1b4b',
+                    width:'100%', padding:'15px 16px 15px 48px',
+                    background:'rgba(255,255,255,0.95)',
+                    border: focused ? '2px solid #6366f1' : '2px solid rgba(99,102,241,0.20)',
+                    borderRadius:'16px', fontSize:'15px', color:'#1e1b4b',
                     outline:'none', boxSizing:'border-box',
-                    boxShadow: focused ? '0 0 0 4px rgba(99,102,241,0.10)' : '0 2px 8px rgba(0,0,0,0.06)',
+                    boxShadow: focused ? '0 0 0 4px rgba(99,102,241,0.12)' : '0 4px 16px rgba(0,0,0,0.06)',
                     transition:'all 0.25s ease',
                   }}
                 />
-                
-
               </div>
               <button type="submit" style={{
-                padding:'14px 24px', borderRadius:'14px', fontWeight:700, fontSize:'15px',
+                padding:'15px 28px', borderRadius:'16px', fontWeight:700, fontSize:'15px',
                 background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'white',
                 border:'none', cursor:'pointer', flexShrink:0,
-                boxShadow:'0 4px 14px rgba(99,102,241,0.35)',
+                boxShadow:'0 4px 16px rgba(99,102,241,0.35)',
                 transition:'all 0.22s ease',
               }}
                 onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(99,102,241,0.45)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 4px 14px rgba(99,102,241,0.35)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='0 4px 16px rgba(99,102,241,0.35)'; }}
               >Search</button>
             </form>
 
             {/* Suggestions Box */}
             {showSuggestions && suggestions.length > 0 && (
               <div style={{
-                display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '12px', marginBottom: '24px',
+                display: 'flex', flexWrap: 'wrap', gap: '6px',
                 animation: 'popIn 0.2s ease both', justifyContent: 'flex-start', alignItems: 'center',
-                maxWidth: '680px', margin: '12px auto 24px auto',
-                background: 'rgba(255, 255, 255, 0.9)',
-                border: '1.5px solid rgba(99,102,241,0.15)',
-                borderRadius: '12px',
+                maxWidth: '680px', margin: '0 auto 20px auto',
+                background: 'rgba(255, 255, 255, 0.95)',
+                border: '1.5px solid rgba(99,102,241,0.18)',
+                borderRadius: '14px',
                 padding: '10px 16px',
-                boxShadow: '0 4px 12px rgba(99,102,241,0.08)',
-                backdropFilter: 'blur(8px)',
+                boxShadow: '0 6px 20px rgba(99,102,241,0.10)',
+                backdropFilter: 'blur(10px)',
                 width: '100%', boxSizing: 'border-box'
               }}>
-                <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: 600, marginRight: '6px' }}>Suggestions:</span>
+                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 700, marginRight: '4px' }}>Quick Matches:</span>
                 {suggestions.map((sug, i) => (
-                  <span
+                  <button
                     key={sug.id || i}
-                    onMouseDown={() => handleSuggestionClick(sug)}
+                    type="button"
+                    onClick={() => handleSuggestionClick(sug)}
                     style={{
                       cursor: 'pointer', transition: 'all 0.15s ease',
-                      fontWeight: 600, color: '#4f46e5', fontSize: '14px',
-                      padding: '4px 8px', borderRadius: '6px'
+                      fontWeight: 700, color: '#4f46e5', fontSize: '13px',
+                      padding: '4px 10px', borderRadius: '8px',
+                      background: 'rgba(99,102,241,0.06)', border: 'none',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.15)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.06)'; }}
                   >
-                    {sug.en_term}
-                  </span>
+                    {sug.en_term} <span className="font-tamil font-normal text-slate-500">({sug.ta_term})</span>
+                  </button>
                 ))}
               </div>
             )}
           </div>
 
           {/* Stats row */}
-          <div className="animate-fade-in-up" style={{ animationDelay:'240ms', display:'flex', justifyContent:'center', gap:'12px', flexWrap:'wrap' }}>
+          <div className="animate-fade-in-up mt-5" style={{ animationDelay:'240ms', display:'flex', justifyContent:'center', gap:'12px', flexWrap:'wrap' }}>
             {[{v:'10K+',l:'Medical Terms'},{v:'98%',l:'Accuracy'},{v:'50+',l:'Categories'},{v:'8+',l:'Years'}].map(s => (
               <StatBadge key={s.l} value={s.v} label={s.l} />
             ))}
@@ -301,12 +320,12 @@ export default function DictionaryPage() {
           <button
             onClick={() => { setCategory(''); setPage(1) }}
             style={{
-              padding:'6px 16px', borderRadius:'999px', fontSize:'12.5px', fontWeight:600,
+              padding:'7px 18px', borderRadius:'999px', fontSize:'12.5px', fontWeight:700,
               cursor:'pointer', transition:'all 0.2s ease',
               background: !category ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : 'white',
-              color: !category ? 'white' : '#6b7280',
+              color: !category ? 'white' : '#64748b',
               boxShadow: !category ? '0 4px 12px rgba(99,102,241,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
-              border: !category ? 'none' : '1.5px solid rgba(99,102,241,0.12)',
+              border: !category ? 'none' : '1.5px solid #e2e8f0',
             }}
           >All Categories</button>
           {categories.map(c => (
@@ -315,12 +334,12 @@ export default function DictionaryPage() {
               onClick={() => { setCategory(c); setPage(1) }}
               className="tag-hover"
               style={{
-                padding:'6px 16px', borderRadius:'999px', fontSize:'12.5px', fontWeight:600,
+                padding:'7px 18px', borderRadius:'999px', fontSize:'12.5px', fontWeight:700,
                 cursor:'pointer', transition:'all 0.2s ease',
                 background: category === c ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : 'white',
-                color: category === c ? 'white' : '#6b7280',
+                color: category === c ? 'white' : '#64748b',
                 boxShadow: category === c ? '0 4px 12px rgba(99,102,241,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
-                border: category === c ? 'none' : '1.5px solid rgba(99,102,241,0.12)',
+                border: category === c ? 'none' : '1.5px solid #e2e8f0',
               }}
             >{c}</button>
           ))}
@@ -328,48 +347,54 @@ export default function DictionaryPage() {
 
         {/* ── Results count ── */}
         {!loading && (
-          <p style={{ fontSize:'13.5px', color:'#9ca3af', marginBottom:'20px', fontWeight:500 }} className="reveal">
-            {total > 0 ? (
-              <>Showing <strong style={{color:'#4f46e5'}}>{terms.length}</strong> of <strong style={{color:'#4f46e5'}}>{total}</strong> results
-                {query && <> for "<span style={{color:'#6366f1',fontWeight:700}}>{query}</span>"</>}
-              </>
-            ) : query ? (
-              <>No results for "<span style={{color:'#6366f1'}}>{query}</span>"</>
-            ) : 'Browse all medical terms'}
-          </p>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'20px', flexWrap:'wrap', gap:'8px' }} className="reveal">
+            <p style={{ fontSize:'14px', color:'#64748b', margin:0, fontWeight:500 }}>
+              {total > 0 ? (
+                <>Showing <strong style={{color:'#4f46e5'}}>{terms.length}</strong> of <strong style={{color:'#4f46e5'}}>{total.toLocaleString()}</strong> medical terms
+                  {query && <> for "<span style={{color:'#6366f1',fontWeight:700}}>{query}</span>"</>}
+                  {category && <> in category <span style={{color:'#6366f1',fontWeight:700}}>{category}</span></>}
+                </>
+              ) : query ? (
+                <>No results found for "<span style={{color:'#6366f1'}}>{query}</span>"</>
+              ) : 'Browse all medical terms'}
+            </p>
+            <p style={{ fontSize:'12px', color:'#94a3b8', margin:0 }}>
+              Page {page} of {pages}
+            </p>
+          </div>
         )}
 
         {/* ── Terms grid ── */}
         {loading ? (
-          <div style={{ padding:'48px 0' }}>
-            <LoadingSpinner size="lg" text="Searching terms..." />
+          <div style={{ padding:'64px 0' }}>
+            <LoadingSpinner size="lg" text="Searching medical terms..." />
           </div>
         ) : terms.length > 0 ? (
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:'16px', marginBottom:'40px' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:'20px', marginBottom:'40px' }}>
             {terms.map((term, i) => <TermCard key={term.id || i} term={term} index={i} />)}
           </div>
         ) : (
           <div style={{ textAlign:'center', padding:'64px 0' }} className="reveal-scale">
             <div style={{ fontSize:'64px', marginBottom:'16px' }}>🔍</div>
-            <h3 style={{ fontSize:'20px', fontWeight:700, color:'#1e1b4b', marginBottom:'8px' }}>No terms found</h3>
-            <p style={{ color:'#9ca3af', marginBottom:'24px' }}>Try a different search term or browse all categories</p>
+            <h3 style={{ fontSize:'20px', fontWeight:700, color:'#1e1b4b', marginBottom:'8px' }}>No medical terms found</h3>
+            <p style={{ color:'#9ca3af', marginBottom:'24px' }}>Try searching in English, Tamil, or clearing your category filters</p>
             <button onClick={() => { setCategory(''); setQuery(''); setInputValue(''); navigate('/dictionary', { replace: true }); }}
               style={{
-                padding:'10px 24px', borderRadius:'12px', fontSize:'14px', fontWeight:600,
+                padding:'12px 28px', borderRadius:'14px', fontSize:'14px', fontWeight:700,
                 background:'linear-gradient(135deg,#6366f1,#4f46e5)', color:'white',
-                border:'none', cursor:'pointer', boxShadow:'0 4px 14px rgba(99,102,241,0.30)',
+                border:'none', cursor:'pointer', boxShadow:'0 4px 16px rgba(99,102,241,0.30)',
               }}>
-              Browse All Terms
+              Reset All Filters
             </button>
           </div>
         )}
 
         {/* ── Pagination ── */}
         {pages > 1 && (
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px' }} className="reveal">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', marginTop:'24px' }} className="reveal">
+            <button onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 380, behavior: 'smooth' }); }} disabled={page === 1}
               style={{
-                width:'38px', height:'38px', display:'flex', alignItems:'center', justifyContent:'center',
+                width:'40px', height:'40px', display:'flex', alignItems:'center', justifyContent:'center',
                 borderRadius:'12px', border:'1.5px solid rgba(99,102,241,0.15)',
                 background:'white', cursor: page===1 ? 'not-allowed' : 'pointer',
                 opacity: page===1 ? 0.4 : 1,
@@ -377,17 +402,27 @@ export default function DictionaryPage() {
               }}
               onMouseEnter={e => { if(page>1) e.currentTarget.style.background='rgba(99,102,241,0.08)'; }}
               onMouseLeave={e => { e.currentTarget.style.background='white'; }}
-            ><ChevronLeft size={17} color="#6366f1" /></button>
+            ><ChevronLeft size={18} color="#6366f1" /></button>
 
+            {/* Page number buttons */}
             {Array.from({ length: Math.min(5, pages) }, (_, i) => {
-              const p = i + 1
+              let p
+              if (pages <= 5) {
+                p = i + 1
+              } else if (page <= 3) {
+                p = i + 1
+              } else if (page >= pages - 2) {
+                p = pages - 4 + i
+              } else {
+                p = page - 2 + i
+              }
               return (
-                <button key={p} onClick={() => setPage(p)}
+                <button key={p} onClick={() => { setPage(p); window.scrollTo({ top: 380, behavior: 'smooth' }); }}
                   style={{
-                    width:'38px', height:'38px', display:'flex', alignItems:'center', justifyContent:'center',
-                    borderRadius:'12px', fontSize:'13px', fontWeight:700, cursor:'pointer',
+                    minWidth:'40px', height:'40px', padding:'0 8px', display:'flex', alignItems:'center', justifyContent:'center',
+                    borderRadius:'12px', fontSize:'13.5px', fontWeight:700, cursor:'pointer',
                     background: page===p ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : 'white',
-                    color: page===p ? 'white' : '#6b7280',
+                    color: page===p ? 'white' : '#64748b',
                     border: page===p ? 'none' : '1.5px solid rgba(99,102,241,0.12)',
                     boxShadow: page===p ? '0 4px 12px rgba(99,102,241,0.30)' : 'none',
                     transition:'all 0.2s ease',
@@ -395,10 +430,11 @@ export default function DictionaryPage() {
               )
             })}
 
-            {pages > 5 && <span style={{ color:'#9ca3af' }}>…</span>}
-            <button onClick={() => setPage(p => Math.min(pages, p + 1))} disabled={page === pages}
+            {pages > 5 && page < pages - 2 && <span style={{ color:'#9ca3af', padding:'0 4px' }}>…</span>}
+
+            <button onClick={() => { setPage(p => Math.min(pages, p + 1)); window.scrollTo({ top: 380, behavior: 'smooth' }); }} disabled={page === pages}
               style={{
-                width:'38px', height:'38px', display:'flex', alignItems:'center', justifyContent:'center',
+                width:'40px', height:'40px', display:'flex', alignItems:'center', justifyContent:'center',
                 borderRadius:'12px', border:'1.5px solid rgba(99,102,241,0.15)',
                 background:'white', cursor: page===pages ? 'not-allowed' : 'pointer',
                 opacity: page===pages ? 0.4 : 1,
@@ -406,7 +442,7 @@ export default function DictionaryPage() {
               }}
               onMouseEnter={e => { if(page<pages) e.currentTarget.style.background='rgba(99,102,241,0.08)'; }}
               onMouseLeave={e => { e.currentTarget.style.background='white'; }}
-            ><ChevronRight size={17} color="#6366f1" /></button>
+            ><ChevronRight size={18} color="#6366f1" /></button>
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { Menu, X, Search, BookOpen, LogIn, ChevronDown } from 'lucide-react'
+import { Menu, X, Search, BookOpen, Sparkles } from 'lucide-react'
 
 const navLinks = [
   { to: '/',           label: 'Home' },
@@ -8,8 +8,6 @@ const navLinks = [
   { to: '/about',      label: 'About' },
   { to: '/services',   label: 'Services' },
   { to: '/blog',       label: 'Blog' },
-  { to: '/collections',label: 'Collections' },
-  { to: '/shop',       label: 'Shop' },
   { to: '/contact',    label: 'Contact Us' },
 ]
 
@@ -110,22 +108,9 @@ export default function Navbar() {
           </div>
 
           {/* ── Desktop Actions ── */}
-          <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '10px', flexShrink: 0 }}>
             <Link
               to="/dictionary"
-              style={{
-                width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                borderRadius: '10px', color: '#6b7280',
-                transition: 'all 0.2s ease',
-              }}
-              aria-label="Search"
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.08)'; e.currentTarget.style.color = '#4f46e5'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = ''; e.currentTarget.style.color = '#6b7280'; }}
-            >
-              <Search size={17} />
-            </Link>
-            <Link
-              to="/login"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '6px',
                 padding: '8px 18px', borderRadius: '10px',
@@ -137,7 +122,7 @@ export default function Navbar() {
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(99,102,241,0.45)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 14px rgba(99,102,241,0.35)'; }}
             >
-              <LogIn size={15} /> Login
+              <Search size={14} /> Search Dictionary
             </Link>
           </div>
 
@@ -194,8 +179,8 @@ export default function Navbar() {
             ))}
           </div>
           <div style={{ paddingTop: '12px', borderTop: '1px solid rgba(99,102,241,0.08)', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <Link to="/login" className="btn-primary" style={{ justifyContent: 'center', fontSize: '14px', gap: '6px' }}>
-              <LogIn size={16} /> Login
+            <Link to="/dictionary" className="btn-primary" style={{ justifyContent: 'center', fontSize: '14px', gap: '6px' }}>
+              <Search size={16} /> Search Dictionary
             </Link>
           </div>
         </div>

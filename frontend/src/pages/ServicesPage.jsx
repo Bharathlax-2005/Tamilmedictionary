@@ -6,13 +6,36 @@ import PageHero from '../components/PageHero'
 import useScrollReveal from '../hooks/useScrollReveal'
 
 function getServiceIcon(ic) {
-  if (!ic || ic === '🔬' || ic === 'Activity') return <Activity size={26} className="text-primary-600" />
+  if (!ic) return <span style={{ fontSize: '28px' }}>🩺</span>
+  
+  const emojiMap = {
+    'FileText': '📋',
+    'Pill': '💊',
+    'GraduationCap': '🔬',
+    'HeartPulse': '🏥',
+    'Smartphone': '📱',
+    'BookMarked': '📖',
+    'Stethoscope': '🩺',
+    'Languages': '🌐',
+    'ShieldCheck': '🛡️',
+    'Activity': '⚡'
+  }
+
+  if (emojiMap[ic]) {
+    return <span style={{ fontSize: '28px', lineHeight: 1 }}>{emojiMap[ic]}</span>
+  }
+
+  if (typeof ic === 'string' && /[\p{Emoji}\u200d]+/u.test(ic)) {
+    return <span style={{ fontSize: '28px', lineHeight: 1 }}>{ic}</span>
+  }
+
+  if (ic === '🔬') return <Microscope size={26} className="text-primary-600" />
   if (ic === '🏥' || ic === '🩺') return <Stethoscope size={26} className="text-cyan-600" />
   if (ic === '🌐' || ic === '🗣️') return <Languages size={26} className="text-teal-600" />
   if (ic === '📄' || ic === '📋') return <FileText size={26} className="text-indigo-600" />
   if (ic === '✅' || ic === '🛡️') return <ShieldCheck size={26} className="text-emerald-600" />
-  if (typeof ic === 'string' && ic.length <= 2) return <Microscope size={26} className="text-primary-600" />
-  return ic
+  
+  return <span style={{ fontSize: '28px', lineHeight: 1 }}>🩺</span>
 }
 
 export default function ServicesPage() {

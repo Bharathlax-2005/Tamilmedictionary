@@ -8,7 +8,6 @@ import {
 
 
 import { getPage, listStats, listServices, listBlogPosts, submitContact, searchTerms } from '../services/api'
-import StatCard from '../components/StatCard'
 import ServiceCard from '../components/ServiceCard'
 import BlogCard from '../components/BlogCard'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -33,12 +32,31 @@ const DEFAULT_HERO = {
 }
 
 function getStatIcon(ic) {
-  if (ic === '📚') return <BookMarked size={32} className="text-primary-600 mb-2 mx-auto" />
-  if (ic === '🎯') return <Target size={32} className="text-primary-600 mb-2 mx-auto" />
-  if (ic === '🏥') return <Building2 size={32} className="text-primary-600 mb-2 mx-auto" />
-  if (ic === '⭐') return <Award size={32} className="text-primary-600 mb-2 mx-auto" />
-  if (typeof ic === 'string' && ic.length <= 2) return <Activity size={32} className="text-primary-600 mb-2 mx-auto" />
-  return <div className="text-3xl mb-2">{ic}</div>
+  const emojiMap = {
+    'BookOpen': '📚',
+    'Users': '👥',
+    'CheckCircle': '🩺',
+    'Globe': '⚡',
+    'Target': '🎯',
+    'Building2': '🏥',
+    'Award': '⭐',
+    'Activity': '⚡'
+  }
+  let emoji = emojiMap[ic] || ic
+  if (!emoji || (!emojiMap[ic] && typeof emoji === 'string' && emoji.length > 4 && !/[\p{Emoji}\u200d]+/u.test(emoji))) {
+    emoji = '📊'
+  }
+  return (
+    <div style={{
+      width: '56px', height: '56px', borderRadius: '18px', margin: '0 auto 12px auto',
+      background: 'rgba(255,255,255,0.92)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: '28px',
+      boxShadow: '0 6px 18px rgba(0,0,0,0.12)'
+    }}>
+      {emoji}
+    </div>
+  )
 }
 
 const AUDIENCES = [
@@ -160,9 +178,25 @@ export default function HomePage() {
   )
 
   const heroData = { ...DEFAULT_HERO, ...(hero || {}) }
-  const aboutData = { heading: "Medical Dictionary in Tamil", body: "", audiences: AUDIENCES.map(a => a.label), ...(about || {}) }
-  const missionData = { heading: "Our Mission", body: "", ...(mission || {}) }
-  const featuredData = { heading: "Medical Glossary Collection", author: "Prof. Dr. Semmal Mustafa", ta_title: "மருத்துவக் கலைச்சொல் களஞ்சியம்", description: "", download_url: "#", ...(featuredResource || {}) }
+  const aboutData = {
+    heading: "Medical Dictionary in Tamil",
+    body: "Accurate and comprehensive medical terminology translated into Tamil. Helping students, doctors, translators, researchers, and healthcare professionals communicate complex medical concepts with confidence and clinical precision.",
+    audiences: AUDIENCES.map(a => a.label),
+    ...(about || {})
+  }
+  const missionData = {
+    heading: "Our Mission",
+    body: "We are committed to preserving, expanding, and standardizing Tamil medical terminology by delivering accurate, reliable, and clinically validated medical translations. Our goal is to bridge the communication gap between English medical science and the Tamil language worldwide.",
+    ...(mission || {})
+  }
+  const featuredData = {
+    heading: "Medical Glossary",
+    author: "Prof. Dr. Semmal Mustafa",
+    ta_title: "மருத்துவக் கலைச்சொல் களஞ்சியம்",
+    description: "Download the official comprehensive medical glossary prepared and verified by Prof. Dr. Semmal Mustafa.",
+    download_url: "/Prof. Dr. Semmal Mustafa மருத்துவக் கலைச்சொல் களஞ்சியம்.docx",
+    ...(featuredResource || {})
+  }
   const areasData = { heading: "Our Expertise", areas: [], ...(specializedAreas || {}) }
 
   return (
@@ -574,13 +608,13 @@ export default function HomePage() {
       </section>
 
 
-      {/* ── 3. FEATURED RESOURCE / MEDICAL GLOSSARY COLLECTION ────────────────────────────── */}
+      {/* ── 3. FEATURED RESOURCE / MEDICAL GLOSSARY ────────────────────────────── */}
       <section className="section-pad bg-gradient-hero border-y border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="glass-card p-6 sm:p-10 border border-slate-200/90 rounded-3xl shadow-xl bg-white/90 backdrop-blur-xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
-              {/* Left Side Collection Image with Modern Curvy Styling */}
+              {/* Left Side Glossary Image with Modern Curvy Styling */}
               <div className="lg:col-span-5 relative group">
                 {/* Background Glow */}
                 <div className="absolute -inset-3 bg-gradient-to-br from-indigo-500 via-primary-500 to-blue-600 rounded-tl-[4.5rem] rounded-br-[4.5rem] rounded-tr-3xl rounded-bl-3xl opacity-25 blur-xl group-hover:opacity-40 transition-all duration-500" />
@@ -589,7 +623,7 @@ export default function HomePage() {
                 <div className="relative rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-2xl rounded-bl-2xl overflow-hidden border-4 border-white shadow-2xl ring-1 ring-slate-200/80 bg-slate-900 aspect-[4/3] sm:h-80 w-full">
                   <img
                     src="/images/collection.png"
-                    alt="Medical Glossary Collection"
+                    alt="Medical Glossary"
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                     onError={(e) => {
                       e.target.onerror = null
@@ -604,7 +638,7 @@ export default function HomePage() {
               <div className="lg:col-span-7 space-y-5 text-left">
                 <div>
                   <span className="badge mb-2 inline-flex items-center gap-1.5 px-3 py-1 bg-primary-100 text-primary-700 font-semibold rounded-full text-xs uppercase tracking-wider">
-                    <Sparkles size={14} className="text-primary-600" /> Featured Collection
+                    <Sparkles size={14} className="text-primary-600" /> Featured Resource
                   </span>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
                     {featuredData.heading}
@@ -621,13 +655,13 @@ export default function HomePage() {
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/collections')}
+                  <a
+                    href={featuredData.download_url || "/Prof. Dr. Semmal Mustafa மருத்துவக் கலைச்சொல் களஞ்சியம்.docx"}
+                    download="Prof. Dr. Semmal Mustafa மருத்துவக் கலைச்சொல் களஞ்சியம்.docx"
                     className="btn-primary inline-flex items-center gap-2 py-3 px-6 rounded-xl shadow-lg"
                   >
-                    <Download size={18} /> Download Document Collection
-                  </button>
+                    <Download size={18} /> Download Medical Glossary (.docx)
+                  </a>
                   <a href="/about" className="btn-outline inline-flex items-center gap-2 py-3 px-5 rounded-xl">
                     Learn More <ArrowRight size={16} />
                   </a>
@@ -752,8 +786,8 @@ export default function HomePage() {
                 <div key={stat.id || i} className="glass-card p-6 text-center animate-fade-in-up"
                   style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'both' }}>
                   {getStatIcon(stat.icon)}
-                  <div className="text-3xl font-extrabold text-primary-600 mb-1">{stat.value}</div>
-                  <p className="text-xs text-slate-500 leading-snug">{stat.label}</p>
+                  <div className="text-3xl font-extrabold text-slate-900 mb-1">{stat.value}</div>
+                  <p className="text-xs text-slate-600 font-semibold leading-snug">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -797,7 +831,7 @@ export default function HomePage() {
               <div key={i} className="soft-card p-8 text-center animate-fade-in-up"
                 style={{ animationDelay: `${i * 120}ms`, animationFillMode: 'both' }}>
                 <div className="w-16 h-16 rounded-2xl bg-slate-100/90 flex items-center justify-center mx-auto mb-5 border border-slate-200/80 shadow-sm">
-                  {typeof area.icon === 'string' ? <Activity size={28} className="text-primary-600" /> : area.icon}
+                  {typeof area.icon === 'string' ? <span style={{ fontSize: '28px' }}>{area.icon}</span> : area.icon}
                 </div>
                 <h3 className="text-xl font-bold text-slate-800 mb-3">{area.title}</h3>
 
