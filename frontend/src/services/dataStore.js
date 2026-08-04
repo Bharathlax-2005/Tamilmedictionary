@@ -6,8 +6,13 @@
  * Google Apps Script Web App: https://script.google.com/macros/s/AKfycbywoXy1vVYC1VMURx6DoMYFWrn0RwlTrxk4RbEZ4I7dUClFPEyECEBQnFDNJGnv3j3Q/exec
  */
 
-export const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywoXy1vVYC1VMURx6DoMYFWrn0RwlTrxk4RbEZ4I7dUClFPEyECEBQnFDNJGnv3j3Q/exec'
-export const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1w2Fag9-HZoWU-B-Sht3FRiaUx62o54fec84jdkbMPXY/edit?gid=872450278#gid=872450278'
+export const GOOGLE_APPS_SCRIPT_URL =
+  import.meta.env?.VITE_GOOGLE_APPS_SCRIPT_URL ||
+  'https://script.google.com/macros/s/AKfycbywoXy1vVYC1VMURx6DoMYFWrn0RwlTrxk4RbEZ4I7dUClFPEyECEBQnFDNJGnv3j3Q/exec'
+
+export const GOOGLE_SHEET_URL =
+  import.meta.env?.VITE_GOOGLE_SHEET_URL ||
+  'https://docs.google.com/spreadsheets/d/1w2Fag9-HZoWU-B-Sht3FRiaUx62o54fec84jdkbMPXY/edit?gid=872450278#gid=872450278'
 
 // ── 1. CMS STATIC CONTENT ───────────────────────────────────────────────────
 export const CMS_PAGES = {
